@@ -1286,7 +1286,8 @@ body {
   align-items: center; justify-content: center;
   transition: opacity .4s ease;
 }
-#splashScreen.hide { opacity: 0; pointer-events: none; }
+#splashScreen.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+#splashScreen.hidden { display: none; }
 .splash-logo { font-size: 48px; margin-bottom: 16px; }
 .splash-title {
   font-size: 28px; font-weight: 800; color: var(--text);
@@ -5099,19 +5100,64 @@ function showBreakLockCheck() {
   showBreakLockScreen(triggerData);
 }
 
-// Splash screen + detection flow
+// Splash screen + detection flow (dual-insurance: transitionend + max-timeout)
 (function initStartupFlow() {
+  console.log('[Splash] 启动流程开始');
   var splash = document.getElementById('splashScreen');
-  // Splash is visible by default; check thresholds after 1.5s
-  setTimeout(function() {
-    recordSession();
-    var triggerData = shouldTriggerBreakLock();
+  if (!splash) {
+    console.log('[Splash] 未找到 splashScreen 元素，跳过');
+    try { renderUsageStatus(); } catch(e) { console.log('[Splash] renderUsageStatus error:', e); }
+    return;
+  }
+
+  var hidden = false;
+  function forceHideSplash() {
+    if (hidden) return;
+    hidden = true;
+    console.log('[Splash] 彻底移除 splash（display:none）');
     splash.classList.add('hide');
+    splash.classList.add('hidden');
+  }
+
+  // Insurance 1: listen for CSS transitionend to set display:none after fade
+  splash.addEventListener('transitionend', function(e) {
+    if (e.propertyName === 'opacity' && !hidden) {
+      console.log('[Splash] transitionend: opacity 动画完成，设置 display:none');
+      forceHideSplash();
+    }
+  });
+
+  // Insurance 2: absolute max timeout — force hide no matter what
+  var forceTimer = setTimeout(function() {
+    if (!hidden) {
+      console.log('[Splash] 兜底：2.5s 强制关闭 splash（transition 可能未触发）');
+      forceHideSplash();
+    }
+  }, 2500);
+
+  // Main timer: detect thresholds after 1.5s
+  setTimeout(function() {
+    console.log('[Splash] 1.5s: 开始检测阈值');
+    try { recordSession(); } catch(e) { console.log('[Splash] recordSession error:', e); }
+
+    var triggerData;
+    try {
+      triggerData = shouldTriggerBreakLock();
+    } catch(e) {
+      console.log('[Splash] shouldTriggerBreakLock error:', e);
+      triggerData = { trigger: false, reason: '' };
+    }
+
+    console.log('[Splash] 检测结果:', triggerData.trigger ? '触发锁屏 — ' + triggerData.reason : '未触发');
+    splash.classList.add('hide');
+
     if (triggerData.trigger) {
       setTimeout(function() { showBreakLockScreen(triggerData); }, 400);
     }
-    // Always render usage status after splash settles (even when lock screen is shown, the bar is pre-rendered underneath)
-    setTimeout(function() { renderUsageStatus(); }, triggerData.trigger ? 600 : 500);
+    // Always render usage status after splash settles
+    setTimeout(function() {
+      try { renderUsageStatus(); } catch(e) { console.log('[Splash] renderUsageStatus error:', e); }
+    }, triggerData.trigger ? 600 : 500);
   }, 1500);
 })();
 
