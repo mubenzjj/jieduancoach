@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jieduancoach-v2';
+const CACHE_NAME = 'jieduancoach-v3';
 const PRECACHE_URLS = ['./index.html', './manifest.json'];
 
 // 安装：预缓存核心文件
