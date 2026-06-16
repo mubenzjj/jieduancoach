@@ -74,23 +74,19 @@ body {
 
 /* Overlay screens */
 .overlay {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,.85);
   z-index: 100;
-  display: flex; align-items: center; justify-content: center;
+  align-items: center; justify-content: center;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  display: none;
 }
 .overlay.show { display: flex; }
 
 /* Modal popup */
 .modal-overlay {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,.8);
   z-index: 110;
-  display: flex; align-items: flex-end; justify-content: center;
-  display: none;
+  align-items: flex-end; justify-content: center;
 }
 .modal-overlay.show { display: flex; }
 .modal-sheet {
@@ -778,10 +774,8 @@ body {
 
 /* Alt Detail Modal */
 .alt-detail-overlay {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,.9); z-index: 120;
-  display: flex; flex-direction: column;
-  display: none;
+  flex-direction: column;
 }
 .alt-detail-overlay.show { display: flex; }
 .alt-detail-header {
@@ -832,10 +826,8 @@ body {
 
 /* Celebration */
 .celebration-overlay {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 130; pointer-events: none; display: none;
+  z-index: 130;
 }
-.celebration-overlay.show { display: block; }
 .particle { position: absolute; pointer-events: none; animation: particleFall 1.5s ease-out forwards; }
 @keyframes particleFall {
   0% { transform: translateY(-60px) rotate(0deg); opacity: 1; }
@@ -1037,10 +1029,9 @@ body {
 
 /* Software Picker Sheet (dark half-screen) */
 .software-picker-overlay {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,.85); z-index: 120;
-  display: flex; align-items: flex-end; justify-content: center;
-  display: none; backdrop-filter: blur(8px);
+  align-items: flex-end; justify-content: center;
+  backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 .software-picker-overlay.show { display: flex; }
@@ -1102,10 +1093,9 @@ body {
 
 /* ============ TOOL ALTERNATIVE PANEL ============ */
 .tool-alt-overlay {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,.92); z-index: 130;
-  display: flex; align-items: flex-end; justify-content: center;
-  display: none; backdrop-filter: blur(12px);
+  align-items: flex-end; justify-content: center;
+  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 .tool-alt-overlay.show { display: flex; }
@@ -1298,6 +1288,45 @@ body {
   text-align: center; max-width: 240px;
 }
 
+/* ======================== Overlay Base Pattern ======================== */
+/* ALL overlays: hidden by default with triple-defense (display + visibility + pointer-events) */
+.overlay, .modal-overlay,
+.login-overlay, .friend-overlay,
+.tool-alt-overlay, .software-picker-overlay, .alt-detail-overlay,
+.celebration-overlay {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+/* Override: when .show is present, make visible */
+.overlay.show, .modal-overlay.show,
+.login-overlay.show, .friend-overlay.show,
+.tool-alt-overlay.show, .software-picker-overlay.show, .alt-detail-overlay.show,
+.celebration-overlay.show {
+  display: flex !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+/* Login Overlay */
+.login-overlay {
+  background: rgba(0,0,0,.92); z-index: 140;
+  align-items: center; justify-content: center;
+}
+
+/* Friend Overlay */
+.friend-overlay {
+  background: rgba(0,0,0,.85); z-index: 140;
+  flex-direction: column;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Phone & Screen: guarantee interactivity */
+#phone, .phone, #screen, .screen { pointer-events: auto; }
+.screen { -webkit-overflow-scrolling: touch; }
+
 /* Break Lock Screen */
 #breakLockScreen {
   position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -1305,11 +1334,13 @@ body {
   z-index: 160;
   display: none; flex-direction: column;
   align-items: center; justify-content: center;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   padding: 40px 24px;
 }
-#breakLockScreen.show { display: flex; }
+#breakLockScreen.show {
+  display: flex;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
 .bls-content { text-align: center; max-width: 320px; width: 100%; }
 .bls-icon { font-size: 48px; margin-bottom: 12px; opacity: .8; }
 .bls-warning {
@@ -5158,8 +5189,69 @@ function showBreakLockCheck() {
     setTimeout(function() {
       try { renderUsageStatus(); } catch(e) { console.log('[Splash] renderUsageStatus error:', e); }
     }, triggerData.trigger ? 600 : 500);
+
+    // Final safety net: ensure interactivity after everything settles
+    setTimeout(function() {
+      try { ensureInteractivity(); } catch(e) { console.log('[Splash] ensureInteractivity error:', e); }
+    }, 3000);
   }, 1500);
 })();
+
+// ============================
+// Safety Net: ensure all overlays are closed and page is interactive
+// ============================
+function ensureInteractivity() {
+  console.log('[Safety] ensureInteractivity: 检查所有 overlay 状态');
+  var overlayIds = [
+    'loginOverlay', 'friendOverlay', 'toolAltOverlay',
+    'breakLockScreen', 'splashScreen',
+    'altDetailOverlay', 'modalOverlay', 'celebrationOverlay',
+    'softwareLinkPickerOverlay'
+  ];
+  var closedCount = 0;
+  overlayIds.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    // Force remove .show from all overlays EXCEPT if they're intentionally open
+    // (at startup, none should be open)
+    if (el.classList.contains('show')) {
+      console.log('[Safety] 发现残留 overlay: #' + id + ' 正在关闭');
+      el.classList.remove('show');
+      closedCount++;
+    }
+    // Ensure display:none for any overlay still visible
+    if (el.style.display !== 'none' && window.getComputedStyle(el).display !== 'none') {
+      el.style.setProperty('display', 'none', 'important');
+      closedCount++;
+    }
+    console.log('[Safety] #' + id + ': display=' + window.getComputedStyle(el).display +
+                ' visibility=' + window.getComputedStyle(el).visibility +
+                ' pointer-events=' + window.getComputedStyle(el).pointerEvents);
+  });
+
+  // Ensure phone and screen containers are interactive
+  var phone = document.getElementById('phone');
+  if (phone) phone.style.setProperty('pointer-events', 'auto', 'important');
+  var screen = document.getElementById('screen');
+  if (screen) screen.style.setProperty('pointer-events', 'auto', 'important');
+
+  console.log('[Safety] ensureInteractivity 完成，关闭了 ' + closedCount + ' 个残留 overlay');
+}
+
+// ============================
+// Global error handler: prevent uncaught errors from killing interactivity
+// ============================
+window.onerror = function(msg, source, lineno, colno, err) {
+  console.error('[GlobalError]', msg, 'at', source + ':' + lineno, err);
+  // Ensure interactivity even after an error
+  try { ensureInteractivity(); } catch(e) {}
+  return false; // let browser also handle it
+};
+
+window.addEventListener('unhandledrejection', function(event) {
+  console.error('[UnhandledRejection]', event.reason);
+  try { ensureInteractivity(); } catch(e) {}
+});
 
 // Threshold settings page
 function toggleBreakLock(el) {
