@@ -1276,6 +1276,98 @@ body {
   }
 }/* ============================================================ */
 
+/* Splash Screen */
+#splashScreen {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: opacity .4s ease;
+}
+#splashScreen.hide { opacity: 0; pointer-events: none; }
+.splash-logo { font-size: 48px; margin-bottom: 16px; }
+.splash-title {
+  font-size: 28px; font-weight: 800; color: var(--text);
+  margin-bottom: 6px; letter-spacing: 2px;
+}
+.splash-sub {
+  font-size: 13px; color: var(--text3); line-height: 1.5;
+  text-align: center; max-width: 240px;
+}
+
+/* Break Lock Screen */
+#breakLockScreen {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,.94);
+  z-index: 160;
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 40px 24px;
+}
+#breakLockScreen.show { display: flex; }
+.bls-content { text-align: center; max-width: 320px; width: 100%; }
+.bls-icon { font-size: 48px; margin-bottom: 12px; opacity: .8; }
+.bls-warning {
+  font-size: 18px; font-weight: 700; color: var(--red);
+  margin-bottom: 6px; line-height: 1.4;
+}
+.bls-subtitle { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
+.bls-stats { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
+.bls-stat-chip {
+  background: var(--card); border-radius: var(--radius-sm);
+  padding: 10px 14px; text-align: center; min-width: 70px;
+}
+.bls-stat-chip .bls-stat-n { font-size: 18px; font-weight: 700; color: var(--text); }
+.bls-stat-chip .bls-stat-l { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.bls-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.bls-btn-primary {
+  width: 100%; padding: 14px; background: var(--accent);
+  color: #fff; border: none; border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s;
+}
+.bls-btn-primary:hover { background: #7c6ff7; }
+.bls-btn-secondary {
+  width: 100%; padding: 14px; background: var(--card);
+  color: var(--accent2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.bls-btn-secondary:hover { background: var(--card2); }
+.bls-btn-skip {
+  width: 100%; padding: 10px; background: transparent;
+  color: var(--text3); border: none; font-size: 13px;
+  cursor: pointer; margin-top: 4px;
+}
+.bls-btn-skip:hover { color: var(--text2); }
+
+/* Threshold settings card */
+.threshold-setting-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 12px;
+}
+.threshold-setting-card .tsc-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+.threshold-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.threshold-row .tsc-label { font-size: 13px; color: var(--text2); }
+.threshold-row input {
+  width: 80px; background: var(--card2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 6px 10px; color: var(--text);
+  font-size: 13px; text-align: center;
+}
+.threshold-row input:focus { outline: none; border-color: var(--accent); }
+.threshold-save-btn {
+  width: 100%; margin-top: 12px; padding: 10px;
+  background: var(--accent); color: #fff; border: none;
+  border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.threshold-save-btn:hover { background: #7c6ff7; }
+
 </style>
 </head>
 <body>
@@ -1284,6 +1376,75 @@ body {
   <div class="status-bar">
     <span>9:41</span>
     <span>●●●●○ &nbsp; Wi-Fi</span>
+  </div>
+
+
+  <!-- Overlay: Login / Register -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-panel">
+      <div class="login-panel-header">
+        <div class="login-panel-title" id="loginPanelTitle">登录</div>
+        <button class="login-panel-close" onclick="closeLoginPanel()">✕</button>
+      </div>
+      <div class="login-tabs">
+        <button class="login-tab active" id="loginTabLogin" onclick="switchLoginTab('login')">登录</button>
+        <button class="login-tab" id="loginTabRegister" onclick="switchLoginTab('register')">快速注册</button>
+      </div>
+      <div id="loginFormContainer">
+        <!-- Login Form -->
+        <div class="login-form" id="loginForm">
+          <div class="form-group">
+            <label>昵称</label>
+            <input class="form-input" id="loginNickname" placeholder="输入昵称" maxlength="12">
+          </div>
+          <div class="form-group">
+            <label>密码</label>
+            <input class="form-input" id="loginPassword" type="password" placeholder="输入密码" maxlength="16">
+          </div>
+          <div class="login-error" id="loginError"></div>
+          <button class="btn-submit" onclick="doLogin()">登 录</button>
+        </div>
+        <!-- Register Form -->
+        <div class="login-form" id="registerForm" style="display:none">
+          <div class="form-group">
+            <label>昵称（2-12字）</label>
+            <input class="form-input" id="regNickname" placeholder="给自己起个名字" maxlength="12">
+          </div>
+          <div class="form-group">
+            <label>性别</label>
+            <div class="gender-options">
+              <div class="gender-opt" id="genderMale" onclick="selectGender('male')">男</div>
+              <div class="gender-opt" id="genderFemale" onclick="selectGender('female')">女</div>
+              <div class="gender-opt selected" id="genderSecret" onclick="selectGender('secret')">保密</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>密码（6-16位）</label>
+            <input class="form-input" id="regPassword" type="password" placeholder="设置密码" maxlength="16">
+          </div>
+          <div class="form-group">
+            <label>确认密码</label>
+            <input class="form-input" id="regPassword2" type="password" placeholder="再次输入密码" maxlength="16">
+          </div>
+          <div class="login-error" id="regError"></div>
+          <button class="btn-submit" onclick="doRegister()">注 册</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay: Friend Matching Panel -->
+  <div class="friend-overlay" id="friendOverlay">
+    <div class="friend-header">
+      <div class="friend-header-title">对戒契约 · 交友匹配</div>
+      <button class="friend-close-btn" onclick="closeFriendPanel()">✕</button>
+    </div>
+    <div class="friend-tabs">
+      <button class="friend-tab active" onclick="switchFriendTab(this,'mycard')">我的名片</button>
+      <button class="friend-tab" onclick="switchFriendTab(this,'search')">寻找搭档</button>
+      <button class="friend-tab" onclick="switchFriendTab(this,'partners')">我的搭档</button>
+    </div>
+    <div class="friend-content" id="friendContent"></div>
   </div>
 
   <!-- Overlay: Decision Card -->
@@ -1328,6 +1489,18 @@ body {
     <div class="hb-alt">或者试试：<span onclick="heavyBlockGoAlt()">5分钟正念呼吸</span></div>
   </div>
 
+  <!-- Splash Screen -->
+  <div id="splashScreen">
+    <div class="splash-logo">🧠</div>
+    <div class="splash-title">戒断教练</div>
+    <div class="splash-sub">把刷手机的时间，换成你真正想做的事</div>
+  </div>
+
+  <!-- Break Lock Screen -->
+  <div id="breakLockScreen">
+    <div class="bls-content" id="blsContent"></div>
+  </div>
+
   <!-- Screen -->
   <div class="screen" id="screen">
 
@@ -1338,6 +1511,11 @@ body {
       <div class="header">
         <h1>下午好，张同学 👋</h1>
         <div class="subtitle">今天是戒断第 12 天 · 比上周少刷 18%</div>
+      </div>
+
+      <!-- Account Area -->
+      <div class="account-area" id="accountArea">
+        <button class="account-login-btn" id="accountLoginBtn" onclick="showLoginPanel()">登录 / 注册</button>
       </div>
 
       <div class="hero-card" onclick="showDashboardDetail()">
@@ -1541,6 +1719,13 @@ body {
         <h1>戒断契约</h1>
         <div class="subtitle">有人看着你，就不容易放弃</div>
       </div>
+      
+      <div class="friend-match-card" onclick="openFriendPanel()">
+        <div class="friend-match-icon">🤝</div>
+        <div class="friend-match-title">交友匹配</div>
+        <div class="friend-match-sub">找一个戒断搭子，互相监督，一起坚持</div>
+      </div>
+
       <div class="section-title">进行中</div>
       <div class="contract-card" onclick="showContractDetail(0)" style="border-color:var(--green)">
         <div class="top">
@@ -1721,6 +1906,22 @@ body {
     <!-- ================================================================ -->
     <div class="page" id="page-settings">
       <div class="header"><h1>设置</h1></div>
+      
+      <div class="device-info-card" id="deviceInfoCard">
+        <div class="device-info-header">设备信息</div>
+        <div id="deviceInfoContent">
+          <div class="device-info-item"><span class="device-info-label">设备型号</span><span class="device-info-value">获取中...</span></div>
+          <div class="device-info-item"><span class="device-info-label">操作系统</span><span class="device-info-value">获取中...</span></div>
+          <div class="device-info-item"><span class="device-info-label">屏幕分辨率</span><span class="device-info-value">获取中...</span></div>
+          <div class="device-info-item"><span class="device-info-label">像素比</span><span class="device-info-value">获取中...</span></div>
+          <div class="device-info-item"><span class="device-info-label">语言</span><span class="device-info-value">获取中...</span></div>
+          <div class="device-info-item"><span class="device-info-label">网络类型</span><span class="device-info-value">获取中...</span></div>
+          <div class="device-info-item"><span class="device-info-label">电池电量</span><span class="device-info-value">获取中...</span></div>
+          <div class="device-info-item"><span class="device-info-label">设备内存</span><span class="device-info-value">获取中...</span></div>
+        </div>
+        <div class="device-sync-time" id="deviceSyncTime">最后同步：--</div>
+      </div>
+
       <div class="setting-group">
         <div class="setting-group-title">通知设置</div>
         <div class="setting-item" onclick="toggleSettingItem(this)">
@@ -1782,6 +1983,26 @@ body {
         <div class="setting-item" onclick="showToast('隐私保护：所有行为数据仅在本地处理，永不上传')">
           <div class="left"><div class="icon" style="background:rgba(255,118,117,.15)">🔒</div><span class="setting-label">隐私与安全</span></div>
           <span class="setting-arrow">→</span>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-group-title">自启动拦截</div>
+        <div class="threshold-setting-card">
+          <div class="tsc-title">拦截阈值配置</div>
+          <div class="threshold-row">
+            <span class="tsc-label">启用自启动拦截</span>
+            <div class="toggle-switch on" id="toggleBreakLock" onclick="toggleBreakLock(this)" style="width:44px;height:24px"></div>
+          </div>
+          <div class="threshold-row">
+            <span class="tsc-label">每日使用上限（分钟）</span>
+            <input type="number" id="thresholdDailyLimit" value="120" min="10" max="480">
+          </div>
+          <div class="threshold-row">
+            <span class="tsc-label">提醒间隔（分钟）</span>
+            <input type="number" id="thresholdBreakInterval" value="45" min="10" max="240">
+          </div>
+          <button class="threshold-save-btn" onclick="saveThresholdSettings()">保存设置</button>
         </div>
       </div>
 
@@ -1853,6 +2074,12 @@ body {
         <span class="software-link-reset-btn" onclick="resetAllAppBindings()">恢复默认</span>
       </div>
       <div class="software-link-page-desc">自定义每个替代活动关联的软件，点击"打开应用"时将使用你设置的软件</div>
+      
+      <div class="scan-apps-section">
+        <button class="scan-apps-btn" id="scanAppsBtn" onclick="scanInstalledApps()">扫描已安装应用</button>
+        <div class="scan-apps-result" id="scanAppsResult" style="display:none"></div>
+      </div>
+
       <div id="softwareLinkContent"></div>
     </div>
 
@@ -2416,6 +2643,7 @@ function navTo(pageName) {
   if (pageName === 'time-bank') renderTimeBank();
   if (pageName === 'achievements') renderAchievements();
   if (pageName === 'software-link') renderSoftwareLinkPage();
+  if (pageName === 'settings') loadThresholdToUI();
   if (pageName === 'new-contract') renderContractTemplates();
 }
 
@@ -3998,8 +4226,814 @@ function drawHomePlanRing() {
 // ============================================================
 // INIT
 // ============================================================
+
+// ============================================================
+// ACCOUNT: LOGIN / REGISTER
+// ============================================================
+let loginTab = 'login';
+let regGender = 'secret';
+
+function showLoginPanel() {
+  document.getElementById('loginOverlay').classList.add('show');
+  switchLoginTab('login');
+}
+
+function closeLoginPanel() {
+  document.getElementById('loginOverlay').classList.remove('show');
+}
+
+function switchLoginTab(tab) {
+  loginTab = tab;
+  document.getElementById('loginTabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('loginTabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('loginPanelTitle').textContent = tab === 'login' ? '登录' : '快速注册';
+  document.getElementById('loginForm').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('regError').textContent = '';
+}
+
+function selectGender(g) {
+  regGender = g;
+  document.querySelectorAll('.gender-opt').forEach(el => el.classList.remove('selected'));
+  document.getElementById('gender' + g.charAt(0).toUpperCase() + g.slice(1)).classList.add('selected');
+}
+
+function doRegister() {
+  const nickname = document.getElementById('regNickname').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const password2 = document.getElementById('regPassword2').value;
+  const errEl = document.getElementById('regError');
+
+  if (nickname.length < 2 || nickname.length > 12) {
+    errEl.textContent = '昵称需要 2-12 个字符';
+    return;
+  }
+  if (password.length < 6 || password.length > 16) {
+    errEl.textContent = '密码需要 6-16 位';
+    return;
+  }
+  if (password !== password2) {
+    errEl.textContent = '两次密码不一致';
+    return;
+  }
+
+  const account = { nickname, gender: regGender, password, createdAt: new Date().toISOString() };
+  localStorage.setItem('jc_account', JSON.stringify(account));
+  localStorage.setItem('jc_logged_in', '1');
+  closeLoginPanel();
+  updateAccountUI();
+  showToast('注册成功，已自动登录');
+}
+
+function doLogin() {
+  const nickname = document.getElementById('loginNickname').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+
+  const raw = localStorage.getItem('jc_account');
+  if (!raw) {
+    errEl.textContent = '未找到账户，请先注册';
+    return;
+  }
+  const account = JSON.parse(raw);
+  if (account.nickname !== nickname || account.password !== password) {
+    errEl.textContent = '昵称或密码错误';
+    return;
+  }
+
+  localStorage.setItem('jc_logged_in', '1');
+  closeLoginPanel();
+  updateAccountUI();
+  showToast('登录成功，欢迎回来');
+}
+
+function doLogout() {
+  localStorage.setItem('jc_logged_in', '0');
+  updateAccountUI();
+  showToast('已退出登录');
+}
+
+function updateAccountUI() {
+  const area = document.getElementById('accountArea');
+  if (!area) return;
+  const loggedIn = localStorage.getItem('jc_logged_in') === '1';
+  const raw = localStorage.getItem('jc_account');
+  let account = null;
+  try { account = raw ? JSON.parse(raw) : null; } catch(e) {}
+
+  if (loggedIn && account) {
+    const initial = account.nickname.charAt(0);
+    area.innerHTML = '<div class="account-avatar">' + initial + '</div><span class="account-name">' + account.nickname + '</span><button class="account-logout-btn" onclick="doLogout()">退出</button>';
+  } else {
+    area.innerHTML = '<button class="account-login-btn" onclick="showLoginPanel()">登录 / 注册</button>';
+  }
+}
+
+// ============================================================
+// DEVICE INFO SYNC
+// ============================================================
+function collectDeviceInfo() {
+  const ua = navigator.userAgent;
+  let deviceModel = 'Unknown';
+  if (ua.indexOf('Windows') >= 0) deviceModel = 'Windows PC';
+  else if (ua.indexOf('Mac') >= 0) deviceModel = 'Mac';
+  else if (ua.indexOf('Android') >= 0) deviceModel = 'Android Device';
+  else if (ua.indexOf('iPhone') >= 0 || ua.indexOf('iPad') >= 0) deviceModel = 'iOS Device';
+  else if (ua.indexOf('Linux') >= 0) deviceModel = 'Linux';
+
+  let battery = 'unknown';
+  try {
+    if (navigator.getBattery) {
+      navigator.getBattery().then(function(b) {
+        battery = Math.round(b.level * 100) + '%';
+      });
+    }
+  } catch(e) {}
+
+  const info = {
+    deviceModel: deviceModel,
+    osVersion: navigator.platform || 'unknown',
+    screenResolution: screen.width + ' × ' + screen.height,
+    devicePixelRatio: window.devicePixelRatio || 'unknown',
+    language: navigator.language || 'unknown',
+    networkType: (navigator.connection && navigator.connection.effectiveType) || 'unknown',
+    battery: battery,
+    memory: navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'unknown',
+    syncTime: new Date().toISOString()
+  };
+
+  localStorage.setItem('jc_device_info', JSON.stringify(info));
+  return info;
+}
+
+function renderDeviceInfo(info) {
+  const container = document.getElementById('deviceInfoContent');
+  const syncEl = document.getElementById('deviceSyncTime');
+  if (!container) return;
+
+  const items = [
+    { label: '设备型号', value: info.deviceModel },
+    { label: '操作系统', value: info.osVersion },
+    { label: '屏幕分辨率', value: info.screenResolution },
+    { label: '像素比', value: info.devicePixelRatio },
+    { label: '语言', value: info.language },
+    { label: '网络类型', value: info.networkType },
+    { label: '电池电量', value: info.battery },
+    { label: '设备内存', value: info.memory }
+  ];
+
+  container.innerHTML = items.map(function(item) {
+    return '<div class="device-info-item"><span class="device-info-label">' + item.label + '</span><span class="device-info-value">' + item.value + '</span></div>';
+  }).join('');
+
+  if (syncEl) {
+    var d = new Date(info.syncTime);
+    syncEl.textContent = '最后同步：' + d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日 ' +
+      String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ':' + String(d.getSeconds()).padStart(2,'0');
+  }
+}
+
+// ============================================================
+// FRIEND MATCHING (Contract Partners)
+// ============================================================
+const PRESET_USERS = [
+  { nickname: '自律侠', gender: 'male', days: 32, bio: '每天6点起床，坚持运动，求一个靠谱的戒断搭子！' },
+  { nickname: '番茄酱', gender: 'female', days: 18, bio: '用番茄钟管理时间，已经18天没刷短视频了，继续加油~' },
+  { nickname: '早睡星人', gender: 'secret', days: 7, bio: '目标是每天晚上11点前睡觉，戒掉睡前刷手机的习惯。' }
+];
+
+function getFriendGenderLabel(g) {
+  return g === 'male' ? '男' : g === 'female' ? '女' : '保密';
+}
+
+function getJoinDays() {
+  var raw = localStorage.getItem('jc_account');
+  if (!raw) return 0;
+  try {
+    var acc = JSON.parse(raw);
+    var created = new Date(acc.createdAt);
+    return Math.floor((new Date() - created) / (1000 * 60 * 60 * 24));
+  } catch(e) { return 0; }
+}
+
+function openFriendPanel() {
+  document.getElementById('friendOverlay').classList.add('show');
+  switchFriendTab(document.querySelector('#friendOverlay .friend-tab'), 'mycard');
+}
+
+function closeFriendPanel() {
+  document.getElementById('friendOverlay').classList.remove('show');
+}
+
+function switchFriendTab(el, tab) {
+  document.querySelectorAll('#friendOverlay .friend-tab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  renderFriendContent(tab);
+}
+
+function renderFriendContent(tab) {
+  var container = document.getElementById('friendContent');
+  if (!container) return;
+
+  if (tab === 'mycard') {
+    var raw = localStorage.getItem('jc_account');
+    var account = null;
+    try { account = raw ? JSON.parse(raw) : null; } catch(e) {}
+    var nickname = account ? account.nickname : '未登录';
+    var gender = account ? account.gender : 'secret';
+    var joinDays = getJoinDays();
+    var bio = localStorage.getItem('jc_bio') || '这个人很懒，还没有写个人宣言...';
+    var initial = nickname.charAt(0);
+    var inviteCode = btoa(unescape(encodeURIComponent(nickname)));
+    var shareLink = 'https://mubenzjj.github.io/jieduancoach/?invite=' + inviteCode;
+
+    container.innerHTML = '<div class="biz-card">' +
+      '<div class="biz-card-avatar">' + initial + '</div>' +
+      '<div class="biz-card-name">' + nickname + '</div>' +
+      '<div class="biz-card-gender">' + getFriendGenderLabel(gender) + ' · 加入 ' + joinDays + ' 天</div>' +
+      '<div class="biz-card-stats">' +
+        '<div class="biz-stat"><div class="biz-stat-val">12</div><div class="biz-stat-lbl">戒断天数</div></div>' +
+        '<div class="biz-stat"><div class="biz-stat-val">' + joinDays + '</div><div class="biz-stat-lbl">加入天数</div></div>' +
+        '<div class="biz-stat"><div class="biz-stat-val">3</div><div class="biz-stat-lbl">契约搭档</div></div>' +
+      '</div>' +
+      '<div class="biz-card-bio" id="bioDisplay" ondblclick="editBio()">' + bio + '</div>' +
+      '<textarea class="biz-card-bio-edit" id="bioEdit" style="display:none" placeholder="写一段个人宣言..."></textarea>' +
+      '<div class="biz-card-share">' +
+        '<button class="biz-share-btn" id="bioSaveBtn" style="display:none" onclick="saveBio()">保存宣言</button>' +
+        '<button class="biz-share-btn" onclick="copyShareLink()">复制分享链接</button>' +
+      '</div>' +
+    '</div>';
+  } else if (tab === 'search') {
+    container.innerHTML = '<div class="partner-search">' +
+      '<input class="partner-search-input" id="partnerSearchInput" placeholder="输入对方名片链接或昵称">' +
+      '<button class="partner-search-btn" onclick="searchPartners()">搜索</button>' +
+    '</div>' +
+    '<div id="partnerSearchResults"></div>' +
+    '<div class="section-title" style="margin-top:16px">推荐搭档</div>' +
+    '<div id="partnerRecommendList">' + renderPresetUsers() + '</div>';
+  } else if (tab === 'partners') {
+    container.innerHTML = renderMyPartners();
+  }
+}
+
+function renderPresetUsers() {
+  return PRESET_USERS.map(function(u) {
+    return '<div class="partner-card">' +
+      '<div class="partner-avatar-sm">' + u.nickname.charAt(0) + '</div>' +
+      '<div class="partner-info">' +
+        '<div class="partner-name">' + u.nickname + '</div>' +
+        '<div class="partner-meta">' + getFriendGenderLabel(u.gender) + ' · 戒断 ' + u.days + ' 天 · ' + u.bio.substring(0,20) + '...</div>' +
+      '</div>' +
+      '<button class="partner-action-btn" onclick="sendContractRequest(\'' + u.nickname + '\',\'' + u.gender + '\',' + u.days + ')">发起契约</button>' +
+    '</div>';
+  }).join('');
+}
+
+function searchPartners() {
+  var input = document.getElementById('partnerSearchInput').value.trim();
+  var resultsDiv = document.getElementById('partnerSearchResults');
+  if (!input) {
+    resultsDiv.innerHTML = '';
+    return;
+  }
+  var found = PRESET_USERS.filter(function(u) {
+    return u.nickname.indexOf(input) >= 0;
+  });
+  if (found.length === 0) {
+    resultsDiv.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">未找到匹配的搭档，试试其他关键词</div>';
+  } else {
+    resultsDiv.innerHTML = '<div class="section-title">搜索结果</div>' + found.map(function(u) {
+      return '<div class="partner-card">' +
+        '<div class="partner-avatar-sm">' + u.nickname.charAt(0) + '</div>' +
+        '<div class="partner-info">' +
+          '<div class="partner-name">' + u.nickname + '</div>' +
+          '<div class="partner-meta">' + getFriendGenderLabel(u.gender) + ' · 戒断 ' + u.days + ' 天</div>' +
+        '</div>' +
+        '<button class="partner-action-btn" onclick="sendContractRequest(\'' + u.nickname + '\',\'' + u.gender + '\',' + u.days + ')">发起契约</button>' +
+      '</div>';
+    }).join('');
+  }
+}
+
+function sendContractRequest(nickname, gender, days) {
+  var partners = [];
+  try {
+    var raw = localStorage.getItem('jc_partners');
+    partners = raw ? JSON.parse(raw) : [];
+  } catch(e) {}
+
+  // Check for duplicates
+  var exists = partners.some(function(p) { return p.nickname === nickname && p.status === 'active'; });
+  if (exists) {
+    showToast('TA 已经是你的搭档了');
+    return;
+  }
+
+  partners.push({
+    nickname: nickname,
+    gender: gender,
+    days: Math.max(days, 1),
+    contractDate: new Date().toISOString(),
+    status: 'active'
+  });
+  localStorage.setItem('jc_partners', JSON.stringify(partners));
+  showToast('契约已发起！' + nickname + ' 已成为你的搭档');
+
+  // Refresh current tab
+  var activeTab = document.querySelector('#friendOverlay .friend-tab.active');
+  if (activeTab) {
+    var tabName = 'mycard';
+    if (activeTab.textContent.indexOf('搭档') >= 0) tabName = 'partners';
+    else if (activeTab.textContent.indexOf('寻找') >= 0) tabName = 'search';
+    renderFriendContent(tabName);
+  }
+}
+
+function renderMyPartners() {
+  var partners = [];
+  try {
+    var raw = localStorage.getItem('jc_partners');
+    partners = raw ? JSON.parse(raw) : [];
+  } catch(e) {}
+
+  if (partners.length === 0) {
+    return '<div style="padding:40px 20px;text-align:center;color:var(--text3);font-size:13px">还没有搭档，去「寻找搭档」找一个吧</div>';
+  }
+
+  return partners.map(function(p, i) {
+    var statusClass = p.status === 'active' ? 'active' : 'ended';
+    var statusLabel = p.status === 'active' ? '进行中' : '已结束';
+    var dateStr = new Date(p.contractDate);
+    var dateLabel = (dateStr.getMonth()+1) + '月' + dateStr.getDate() + '日';
+    return '<div class="partner-card">' +
+      '<div class="partner-avatar-sm">' + p.nickname.charAt(0) + '</div>' +
+      '<div class="partner-info">' +
+        '<div class="partner-name">' + p.nickname + '</div>' +
+        '<div class="partner-meta">' + getFriendGenderLabel(p.gender) + ' · 契约 ' + p.days + ' 天 · ' + dateLabel + ' 建立</div>' +
+      '</div>' +
+      '<span class="partner-status ' + statusClass + '">' + statusLabel + '</span>' +
+      (p.status === 'active' ? '<button class="partner-dissolve-btn" onclick="dissolvePartner(' + i + ')">解除</button>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function dissolvePartner(index) {
+  var partners = [];
+  try {
+    var raw = localStorage.getItem('jc_partners');
+    partners = raw ? JSON.parse(raw) : [];
+  } catch(e) {}
+
+  if (index >= 0 && index < partners.length) {
+    partners[index].status = 'ended';
+    localStorage.setItem('jc_partners', JSON.stringify(partners));
+    showToast('已解除契约关系');
+    renderFriendContent('partners');
+  }
+}
+
+function editBio() {
+  var bioDisplay = document.getElementById('bioDisplay');
+  var bioEdit = document.getElementById('bioEdit');
+  var saveBtn = document.getElementById('bioSaveBtn');
+  if (bioDisplay && bioEdit) {
+    bioDisplay.style.display = 'none';
+    bioEdit.style.display = '';
+    bioEdit.value = localStorage.getItem('jc_bio') || '';
+    if (saveBtn) saveBtn.style.display = '';
+  }
+}
+
+function saveBio() {
+  var bioEdit = document.getElementById('bioEdit');
+  var bio = bioEdit ? bioEdit.value.trim() : '';
+  localStorage.setItem('jc_bio', bio);
+  renderFriendContent('mycard');
+  showToast('个人宣言已保存');
+}
+
+function copyShareLink() {
+  var raw = localStorage.getItem('jc_account');
+  var nickname = 'user';
+  try { var acc = JSON.parse(raw); nickname = acc.nickname; } catch(e) {}
+  var inviteCode = btoa(unescape(encodeURIComponent(nickname)));
+  var link = 'https://mubenzjj.github.io/jieduancoach/?invite=' + inviteCode;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(function() {
+      showToast('分享链接已复制到剪贴板');
+    });
+  } else {
+    // Fallback
+    var ta = document.createElement('textarea');
+    ta.value = link;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('分享链接已复制到剪贴板');
+  }
+}
+
+// ============================================================
+// SCAN INSTALLED APPS (URL Scheme Detection)
+// ============================================================
+var APP_SCHEMES = [
+  { name: '微信', scheme: 'weixin://', pkg: 'com.tencent.mm' },
+  { name: '支付宝', scheme: 'alipay://', pkg: 'com.eg.android.AlipayGphone' },
+  { name: 'QQ', scheme: 'mqq://', pkg: 'com.tencent.mobileqq' },
+  { name: '淘宝', scheme: 'taobao://', pkg: 'com.taobao.taobao' },
+  { name: '抖音', scheme: 'snssdk1128://', pkg: 'com.ss.android.ugc.aweme' },
+  { name: '抖音极速版', scheme: 'snssdk1128://', pkg: 'com.ss.android.ugc.aweme.lite' },
+  { name: '快手', scheme: 'kwai://', pkg: 'com.smile.gifmaker' },
+  { name: 'B站', scheme: 'bilibili://', pkg: 'tv.danmaku.bili' },
+  { name: '知乎', scheme: 'zhihu://', pkg: 'com.zhihu.android' },
+  { name: '钉钉', scheme: 'dingtalk://', pkg: 'com.alibaba.android.rimet' },
+  { name: '网易云音乐', scheme: 'orpheus://', pkg: 'com.netease.cloudmusic' },
+  { name: 'QQ音乐', scheme: 'qqmusic://', pkg: 'com.tencent.qqmusic' },
+  { name: '微博', scheme: 'sinaweibo://', pkg: 'com.sina.weibo' },
+  { name: '美团', scheme: 'imeituan://', pkg: 'com.sankuai.meituan' },
+  { name: '京东', scheme: 'openapp.jdmobile://', pkg: 'com.jingdong.app.mall' }
+];
+
+var scannedApps = [];
+
+function scanInstalledApps() {
+  var btn = document.getElementById('scanAppsBtn');
+  var resultDiv = document.getElementById('scanAppsResult');
+  btn.textContent = '扫描中...';
+  btn.disabled = true;
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text3);font-size:12px">正在探测已安装应用...</div>';
+  scannedApps = [];
+
+  // Probe schemes one by one with a small delay
+  var i = 0;
+  function probeNext() {
+    if (i >= APP_SCHEMES.length) {
+      // Done scanning
+      renderScanResults();
+      btn.textContent = '重新扫描';
+      btn.disabled = false;
+      return;
+    }
+
+    var app = APP_SCHEMES[i];
+    var startTime = Date.now();
+    var iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = app.scheme;
+    document.body.appendChild(iframe);
+
+    setTimeout(function() {
+      var elapsed = Date.now() - startTime;
+      document.body.removeChild(iframe);
+
+      // Heuristic: if the blur happened quickly (< 200ms after scheme load), the app is likely installed
+      // On desktop/web, we just mark all as "possibly available" since we can't truly detect
+      // We'll use a simple approach: assume installed if we didn't get a quick timeout
+      if (elapsed < 500) {
+        scannedApps.push(app);
+      }
+      i++;
+      setTimeout(probeNext, 100);
+    }, 200);
+  }
+
+  setTimeout(probeNext, 50);
+}
+
+function renderScanResults() {
+  var resultDiv = document.getElementById('scanAppsResult');
+  if (scannedApps.length === 0) {
+    resultDiv.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text3);font-size:12px">未检测到已安装应用（桌面端可能无法检测），可手动添加下方应用</div>';
+    // Show manual add option
+    resultDiv.innerHTML += '<div class="scanned-app-item">' +
+      '<span class="scanned-app-name">手动添加</span>' +
+      '<input class="partner-search-input" id="manualPkgInput" placeholder="输入包名" style="width:140px;font-size:12px">' +
+      '<button class="scanned-add-btn" onclick="addManualApp()">添加</button>' +
+    '</div>';
+    return;
+  }
+
+  // Get existing custom software to mark already added ones
+  var customRaw = localStorage.getItem('jc_custom_software');
+  var custom = [];
+  try { custom = customRaw ? JSON.parse(customRaw) : []; } catch(e) {}
+
+  var html = '';
+  scannedApps.forEach(function(app) {
+    var alreadyAdded = custom.some(function(c) { return c.pkg === app.pkg; });
+    html += '<div class="scanned-app-item">' +
+      '<div><span class="scanned-app-name">' + app.name + '</span><span class="scanned-app-scheme">' + app.scheme + '</span></div>' +
+      (alreadyAdded
+        ? '<span class="scanned-added">已添加</span>'
+        : '<button class="scanned-add-btn" onclick="addScannedApp(\'' + app.name + '\',\'' + app.pkg + '\')">添加到链接管理</button>') +
+    '</div>';
+  });
+
+  resultDiv.innerHTML = html;
+}
+
+function addScannedApp(name, pkg) {
+  var customRaw = localStorage.getItem('jc_custom_software');
+  var custom = [];
+  try { custom = customRaw ? JSON.parse(customRaw) : []; } catch(e) {}
+
+  // Check duplicate
+  if (custom.some(function(c) { return c.pkg === pkg; })) {
+    showToast('该应用已在链接管理中');
+    return;
+  }
+
+  custom.push({ name: name, pkg: pkg, type: 'open_app' });
+  localStorage.setItem('jc_custom_software', JSON.stringify(custom));
+  showToast(name + ' 已添加到链接管理');
+
+  // Refresh scan results
+  scanInstalledApps();
+
+  // Also refresh software link page if visible
+  if (document.getElementById('page-software-link').classList.contains('active')) {
+    renderSoftwareLinkPage();
+  }
+}
+
+function addManualApp() {
+  var pkgInput = document.getElementById('manualPkgInput');
+  if (!pkgInput) return;
+  var pkg = pkgInput.value.trim();
+  if (!pkg) { showToast('请输入包名'); return; }
+
+  var customRaw = localStorage.getItem('jc_custom_software');
+  var custom = [];
+  try { custom = customRaw ? JSON.parse(customRaw) : []; } catch(e) {}
+
+  if (custom.some(function(c) { return c.pkg === pkg; })) {
+    showToast('该应用已在链接管理中');
+    return;
+  }
+
+  var name = pkg.split('.').pop();
+  custom.push({ name: name, pkg: pkg, type: 'open_app' });
+  localStorage.setItem('jc_custom_software', JSON.stringify(custom));
+  showToast(name + ' 已添加到链接管理');
+
+  if (document.getElementById('page-software-link').classList.contains('active')) {
+    renderSoftwareLinkPage();
+  }
+}
+
+
+// ============================================================
+// BREAK LOCK SCREEN — Usage Threshold & Startup Intercept
+// ============================================================
+
+function loadThreshold() {
+  var defaults = { dailyLimit: 120, breakInterval: 45, enabled: true };
+  try {
+    var raw = localStorage.getItem('jc_usage_threshold');
+    return raw ? Object.assign({}, defaults, JSON.parse(raw)) : defaults;
+  } catch(e) { return defaults; }
+}
+
+function saveThreshold(cfg) {
+  localStorage.setItem('jc_usage_threshold', JSON.stringify(cfg));
+}
+
+function getTodayUsage() {
+  // Try to read stored value; if missing, simulate
+  try {
+    var raw = localStorage.getItem('jc_today_usage');
+    if (raw) return parseInt(raw, 10);
+  } catch(e) {}
+  // Simulate: 0-180 minutes randomly, biased toward higher values
+  var sim = Math.floor(Math.random() * 180);
+  localStorage.setItem('jc_today_usage', String(sim));
+  return sim;
+}
+
+function bumpTodayUsage() {
+  var current = getTodayUsage();
+  var bump = 5 + Math.floor(Math.random() * 26); // 5–30 min increment
+  var updated = current + bump;
+  localStorage.setItem('jc_today_usage', String(updated));
+  return updated;
+}
+
+function getLastBreak() {
+  try {
+    var raw = localStorage.getItem('jc_last_break');
+    return raw || null;
+  } catch(e) { return null; }
+}
+
+function recordBreak() {
+  localStorage.setItem('jc_last_break', new Date().toISOString());
+}
+
+function recordSkip() {
+  var log = [];
+  try {
+    var raw = localStorage.getItem('jc_skip_log');
+    log = raw ? JSON.parse(raw) : [];
+  } catch(e) {}
+  log.push({
+    time: new Date().toISOString(),
+    usage: getTodayUsage()
+  });
+  // Keep last 50
+  if (log.length > 50) log = log.slice(-50);
+  localStorage.setItem('jc_skip_log', JSON.stringify(log));
+}
+
+function recordSession() {
+  var sessions = [];
+  try {
+    var raw = localStorage.getItem('jc_sessions');
+    sessions = raw ? JSON.parse(raw) : [];
+  } catch(e) {}
+  // Close any open session
+  if (sessions.length > 0 && !sessions[sessions.length - 1].endTime) {
+    sessions[sessions.length - 1].endTime = new Date().toISOString();
+    sessions[sessions.length - 1].duration = Math.round(
+      (new Date(sessions[sessions.length - 1].endTime) - new Date(sessions[sessions.length - 1].startTime)) / 60000
+    );
+  }
+  sessions.push({ startTime: new Date().toISOString(), endTime: null, duration: 0 });
+  if (sessions.length > 100) sessions = sessions.slice(-100);
+  localStorage.setItem('jc_sessions', JSON.stringify(sessions));
+}
+
+function closeCurrentSession() {
+  var sessions = [];
+  try {
+    var raw = localStorage.getItem('jc_sessions');
+    sessions = raw ? JSON.parse(raw) : [];
+  } catch(e) {}
+  if (sessions.length > 0 && !sessions[sessions.length - 1].endTime) {
+    sessions[sessions.length - 1].endTime = new Date().toISOString();
+    sessions[sessions.length - 1].duration = Math.round(
+      (new Date(sessions[sessions.length - 1].endTime) - new Date(sessions[sessions.length - 1].startTime)) / 60000
+    );
+    localStorage.setItem('jc_sessions', JSON.stringify(sessions));
+  }
+}
+
+function shouldTriggerBreakLock() {
+  var cfg = loadThreshold();
+  if (!cfg.enabled) return { trigger: false, reason: '' };
+
+  var usage = bumpTodayUsage(); // Add random bump on each check
+  var lastBreak = getLastBreak();
+  var now = Date.now();
+
+  if (usage >= cfg.dailyLimit) {
+    return { trigger: true, reason: 'dailyLimit', usage: usage, limit: cfg.dailyLimit };
+  }
+
+  if (lastBreak) {
+    var elapsed = now - new Date(lastBreak).getTime();
+    if (elapsed >= cfg.breakInterval * 60 * 1000) {
+      var elapsedMin = Math.floor(elapsed / 60000);
+      return { trigger: true, reason: 'breakInterval', usage: usage, elapsedMin: elapsedMin, interval: cfg.breakInterval };
+    }
+  } else {
+    // No record of any break yet; if usage > 60, trigger as a first nudge
+    if (usage >= 60) {
+      return { trigger: true, reason: 'firstNudge', usage: usage, limit: cfg.dailyLimit };
+    }
+  }
+
+  return { trigger: false, reason: '' };
+}
+
+function showBreakLockScreen(triggerData) {
+  var overlay = document.getElementById('breakLockScreen');
+  var content = document.getElementById('blsContent');
+
+  var cfg = loadThreshold();
+  var usage = triggerData.usage || 0;
+  var warning, subtitle;
+
+  if (triggerData.reason === 'dailyLimit') {
+    warning = '你已使用 ' + usage + ' 分钟，超过每日限额';
+    subtitle = '每日限额 ' + triggerData.limit + ' 分钟，先做点别的吧';
+  } else if (triggerData.reason === 'breakInterval') {
+    warning = '该休息了，距离上次休息已过 ' + triggerData.elapsedMin + ' 分钟';
+    subtitle = '提醒间隔 ' + triggerData.interval + ' 分钟，记得按时休息';
+  } else {
+    warning = '已经使用 ' + usage + ' 分钟了，先来面对一下自己吧';
+    subtitle = '今日限额 ' + triggerData.limit + ' 分钟';
+  }
+
+  content.innerHTML =
+    '<div class="bls-icon">⏰</div>' +
+    '<div class="bls-warning">' + warning + '</div>' +
+    '<div class="bls-subtitle">' + subtitle + '</div>' +
+    '<div class="bls-stats">' +
+      '<div class="bls-stat-chip"><div class="bls-stat-n">' + usage + 'min</div><div class="bls-stat-l">今日已用</div></div>' +
+      '<div class="bls-stat-chip"><div class="bls-stat-n">' + cfg.dailyLimit + 'min</div><div class="bls-stat-l">每日限额</div></div>' +
+      '<div class="bls-stat-chip"><div class="bls-stat-n">' + cfg.breakInterval + 'min</div><div class="bls-stat-l">提醒间隔</div></div>' +
+    '</div>' +
+    '<div class="bls-actions">' +
+      '<button class="bls-btn-primary" onclick="breakLockGoAlt()">做替代推荐</button>' +
+      '<button class="bls-btn-secondary" onclick="breakLockThreeSec()">三秒决策</button>' +
+    '</div>' +
+    '<button class="bls-btn-skip" onclick="breakLockSkip()">坚持使用</button>';
+
+  overlay.classList.add('show');
+}
+
+function breakLockGoAlt() {
+  document.getElementById('breakLockScreen').classList.remove('show');
+  recordBreak();
+  navTo('alternatives');
+}
+
+function breakLockThreeSec() {
+  document.getElementById('breakLockScreen').classList.remove('show');
+  recordBreak();
+  // Call the existing decision card
+  showDecision('手机', '娱乐', '2.3', '1.4', '2h');
+}
+
+function breakLockSkip() {
+  document.getElementById('breakLockScreen').classList.remove('show');
+  recordSkip();
+  // Allow entry without recording break
+}
+
+// Splash screen + detection flow
+(function initStartupFlow() {
+  var splash = document.getElementById('splashScreen');
+  // Splash is visible by default; check thresholds after 1.5s
+  setTimeout(function() {
+    recordSession();
+    var triggerData = shouldTriggerBreakLock();
+    splash.classList.add('hide');
+    if (triggerData.trigger) {
+      setTimeout(function() { showBreakLockScreen(triggerData); }, 400);
+    }
+  }, 1500);
+})();
+
+// Threshold settings page
+function toggleBreakLock(el) {
+  el.classList.toggle('on');
+}
+
+function loadThresholdToUI() {
+  var cfg = loadThreshold();
+  var toggle = document.getElementById('toggleBreakLock');
+  var dailyInput = document.getElementById('thresholdDailyLimit');
+  var intervalInput = document.getElementById('thresholdBreakInterval');
+
+  if (toggle) {
+    if (cfg.enabled) toggle.classList.add('on'); else toggle.classList.remove('on');
+  }
+  if (dailyInput) dailyInput.value = cfg.dailyLimit;
+  if (intervalInput) intervalInput.value = cfg.breakInterval;
+}
+
+function saveThresholdSettings() {
+  var toggle = document.getElementById('toggleBreakLock');
+  var dailyInput = document.getElementById('thresholdDailyLimit');
+  var intervalInput = document.getElementById('thresholdBreakInterval');
+
+  var cfg = {
+    dailyLimit: parseInt(dailyInput.value, 10) || 120,
+    breakInterval: parseInt(intervalInput.value, 10) || 45,
+    enabled: toggle ? toggle.classList.contains('on') : true
+  };
+
+  if (cfg.dailyLimit < 10) cfg.dailyLimit = 10;
+  if (cfg.dailyLimit > 480) cfg.dailyLimit = 480;
+  if (cfg.breakInterval < 10) cfg.breakInterval = 10;
+  if (cfg.breakInterval > 240) cfg.breakInterval = 240;
+
+  saveThreshold(cfg);
+  showToast('拦截阈值已保存');
+}
+
+// Close session on page unload
+window.addEventListener('beforeunload', function() { closeCurrentSession(); });
+
+
 renderHomeBadges();
 drawHomePlanRing();
+
+// Initialize account UI
+updateAccountUI();
+
+// Collect and render device info
+(function() {
+  var info = collectDeviceInfo();
+  setTimeout(function() { renderDeviceInfo(info); }, 300);
+})();
 
 // close modals on overlay click
 document.getElementById('decisionOverlay')?.addEventListener('click', function(e) {
