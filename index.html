@@ -1099,6 +1099,163 @@ body {
   cursor: pointer; transition: all .2s;
 }
 .picker-confirm-btn:hover { background: #7c6ff7; }
+
+/* ============ TOOL ALTERNATIVE PANEL ============ */
+.tool-alt-overlay {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,.92); z-index: 130;
+  display: flex; align-items: flex-end; justify-content: center;
+  display: none; backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.tool-alt-overlay.show { display: flex; }
+.tool-alt-panel {
+  width: 100%; height: 85%;
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  display: flex; flex-direction: column;
+  animation: slideUp .35s cubic-bezier(.16,1,.3,1);
+}
+.tap-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.tap-header .tap-title {
+  font-size: 16px; font-weight: 700; color: var(--text);
+  display: flex; align-items: center; gap: 8px;
+}
+.tap-header .tap-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--card2); border: none; color: var(--text2);
+  font-size: 16px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.tap-header .tap-close:hover { background: var(--red); color: #fff; }
+.tap-body {
+  flex: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+.tap-guide {
+  text-align: center; padding: 30px 20px; flex: 1;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center;
+}
+.tap-guide .tap-guide-icon { font-size: 52px; margin-bottom: 16px; }
+.tap-guide .tap-guide-title { font-size: 17px; color: var(--text); font-weight: 700; margin-bottom: 8px; }
+.tap-guide .tap-guide-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.tap-guide .tap-guide-btn {
+  margin-top: 20px; padding: 10px 24px; background: var(--accent);
+  color: #fff; border: none; border-radius: 10px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+
+/* Notepad */
+.tap-notepad {
+  flex: 1; display: flex; flex-direction: column;
+}
+.tap-notepad textarea {
+  flex: 1; background: #12121c; border: none; color: var(--text);
+  padding: 14px 16px; font-size: 14px; font-family: inherit;
+  resize: none; outline: none; line-height: 1.7;
+  border-radius: 0;
+}
+.tap-notepad textarea::placeholder { color: var(--text3); }
+.tap-notepad-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.tap-notepad-bar .tap-nb-status {
+  font-size: 11px; color: var(--green); flex: 1;
+}
+.tap-notepad-bar button {
+  padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card2); color: var(--text2); font-size: 12px;
+  font-weight: 600; cursor: pointer; transition: all .2s;
+}
+.tap-notepad-bar button:hover { border-color: var(--accent); color: var(--text); }
+
+/* Paint */
+.tap-paint {
+  flex: 1; display: flex; flex-direction: column;
+}
+.tap-paint canvas {
+  flex: 1; background: #fff; border-radius: 4px;
+  margin: 10px; touch-action: none; cursor: crosshair;
+}
+.tap-paint-toolbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-top: 1px solid var(--border);
+  flex-shrink: 0; flex-wrap: wrap;
+}
+.tap-paint-toolbar .color-dot {
+  width: 26px; height: 26px; border-radius: 50%;
+  cursor: pointer; transition: all .15s; border: 2px solid transparent;
+}
+.tap-paint-toolbar .color-dot.active { border-color: #fff; transform: scale(1.15); }
+.tap-paint-toolbar input[type=range] {
+  flex: 1; min-width: 60px; -webkit-appearance: none;
+  height: 4px; background: var(--border); border-radius: 2px; outline: none;
+}
+.tap-paint-toolbar input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px;
+  border-radius: 50%; background: var(--accent); cursor: pointer;
+}
+.tap-paint-toolbar .tap-btn {
+  padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card2); color: var(--text2); font-size: 12px;
+  font-weight: 600; cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.tap-paint-toolbar .tap-btn:hover { border-color: var(--accent); color: var(--text); }
+.tap-paint-toolbar .tap-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Calculator */
+.tap-calc {
+  flex: 1; display: flex; flex-direction: column; padding: 16px;
+}
+.tap-calc .calc-display {
+  background: #0a0a10; border-radius: 12px;
+  padding: 20px 16px; margin-bottom: 16px;
+  text-align: right; min-height: 80px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  border: 1px solid var(--border);
+}
+.tap-calc .calc-display .calc-expr {
+  font-size: 14px; color: var(--text3); min-height: 20px;
+  word-break: break-all; line-height: 1.4;
+}
+.tap-calc .calc-display .calc-result {
+  font-size: 36px; font-weight: 700; color: #fff;
+  font-variant-numeric: tabular-nums; line-height: 1.2; margin-top: 4px;
+}
+.tap-calc .calc-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 8px;
+}
+.tap-calc .calc-grid button {
+  padding: 16px 0; border-radius: 12px; border: none;
+  font-size: 20px; font-weight: 600; cursor: pointer;
+  transition: all .15s; font-family: inherit;
+}
+.tap-calc .calc-grid .btn-num {
+  background: var(--card2); color: var(--text);
+}
+.tap-calc .calc-grid .btn-num:hover { background: #333348; }
+.tap-calc .calc-grid .btn-op {
+  background: rgba(108,92,231,.2); color: var(--accent2);
+}
+.tap-calc .calc-grid .btn-op:hover { background: rgba(108,92,231,.35); }
+.tap-calc .calc-grid .btn-eq {
+  background: var(--accent); color: #fff;
+}
+.tap-calc .calc-grid .btn-eq:hover { background: #7c6ff7; }
+.tap-calc .calc-grid .btn-clr {
+  background: rgba(255,118,117,.15); color: var(--red);
+}
+.tap-calc .calc-grid .btn-clr:hover { background: rgba(255,118,117,.25); }
+
+/* Camera trigger hidden */
+#cameraTrigger { display: none; }
 </style>
 </head>
 <body>
@@ -1709,6 +1866,22 @@ body {
     </div>
 
   </div><!-- end screen -->
+
+  <!-- Tool Alternative Panel -->
+  <div class="tool-alt-overlay" id="toolAltOverlay">
+    <div class="tool-alt-panel">
+      <div class="tap-header">
+        <div class="tap-title" id="tapTitle"></div>
+        <button class="tap-close" onclick="closeToolAlt()">✕</button>
+      </div>
+      <div class="tap-body" id="tapBody"></div>
+    </div>
+  </div>
+
+  <!-- Hidden camera trigger for mobile -->
+  <input type="file" id="cameraTrigger" capture="camera" accept="image/*" onchange="handleCameraCapture(event)">
+
+  </div><!-- end phone -->
 
   <!-- Bottom Navigation -->
   <div class="bottom-nav" id="bottomNav">
@@ -2374,14 +2547,424 @@ function getAppTagIcon(app) {
   return '🖥️';
 }
 
+// ============================================================
+// APP URL SCHEME MAPPING (for mobile direct launch)
+// ============================================================
+const APP_SCHEMES = {
+  'com.tencent.mm': 'weixin://',
+  'com.tencent.weread': 'weread://',
+  'com.xingin.xhs': 'xhsdiscover://',
+  'tv.danmaku.bili': 'bilibili://',
+  'com.gotokeep.keep': 'keep://',
+  'com.duolingo': 'duolingo://',
+  'com.douban.frodo': 'douban://',
+  'com.tencent.qqmusic': 'qqmusic://',
+  'com.netease.cloudmusic': 'orpheus://',
+};
+
+const TOOL_ALT_MAP = {
+  notepad:    { title: '简易记事本', icon: '📝', type: 'embed', render: renderNotepad },
+  mspaint:    { title: '简易画板',   icon: '🎨', type: 'embed', render: renderPaint },
+  clock:      { title: '时钟',       icon: '🕐', type: 'guide', msg: '请从手机桌面打开「时钟」App', guideIcon: '🕐' },
+  calc:       { title: '计算器',     icon: '🔢', type: 'embed', render: renderCalc },
+  camera:     { title: '相机',       icon: '📷', type: 'guide', msg: '点击下方按钮打开相机拍照',
+                guideIcon: '📷', actionLabel: '打开相机', action: 'triggerCamera' },
+  snippingtool:{ title: '截图',      icon: '✂️', type: 'guide', msg: '请使用手机自带截图快捷键：\n音量减 + 电源键（Android）\n或 电源键 + Home（iPhone）', guideIcon: '✂️' },
+  mediaplayer:{ title: '媒体播放器', icon: '▶️', type: 'guide', msg: '请使用手机自带播放器打开媒体文件', guideIcon: '▶️' },
+  photos:     { title: '相册',       icon: '🖼️', type: 'guide', msg: '请从手机桌面打开「相册」App', guideIcon: '🖼️' },
+  sticky_notes:{ title: '便笺',      icon: '📋', type: 'guide', msg: '请打开手机自带便签/备忘录App', guideIcon: '📋' },
+  edge_favorites:{ title: '收藏夹',  icon: '⭐', type: 'guide', msg: '请在浏览器中打开收藏夹', guideIcon: '⭐' },
+  timer:      { title: '计时器',     icon: '⏱️', type: 'guide', msg: '请从手机桌面打开「时钟」→「计时器」', guideIcon: '⏱️' },
+};
+
 function openAltApp() {
   if (!currentAltDetail) return;
   const effective = getEffectiveApp(currentAltDetail.alt);
   if (!effective) return;
-  const url = `http://localhost:18888/open?action=${encodeURIComponent(effective.action)}&target=${encodeURIComponent(effective.target)}`;
-  fetch(url, { mode: 'no-cors' })
-    .then(() => showToast(`正在打开 ${effective.name}`))
-    .catch(() => showToast(`请在电脑端打开此功能，或手动打开 ${effective.name}`));
+
+  const { action, target, name } = effective;
+
+  if (action === 'open_url') {
+    window.open(target, '_blank');
+    showToast(`正在打开 ${name || target}`);
+  } else if (action === 'open_app') {
+    launchApp(target, name);
+  } else if (action === 'open_tool') {
+    openToolAlternative(target, name);
+  }
+}
+
+function launchApp(packageName, name) {
+  const scheme = APP_SCHEMES[packageName];
+  if (scheme) {
+    const startTime = Date.now();
+    window.location.href = scheme;
+
+    // 2-second timeout: if still on this page, app not installed
+    setTimeout(function() {
+      if (Date.now() - startTime < 2500) {
+        var appName = name || packageName;
+        if (confirm('未检测到「' + appName + '」，是否前往应用商店下载？')) {
+            // Try universal link or market link
+            var marketUrl = '';
+            if (packageName === 'com.tencent.mm') marketUrl = 'https://weixin.qq.com/';
+            else if (packageName === 'com.tencent.weread') marketUrl = 'https://weread.qq.com/';
+            else if (packageName === 'com.xingin.xhs') marketUrl = 'https://www.xiaohongshu.com/';
+            else if (packageName === 'tv.danmaku.bili') marketUrl = 'https://app.bilibili.com/';
+            else if (packageName === 'com.gotokeep.keep') marketUrl = 'https://www.gotokeep.com/';
+            else if (packageName === 'com.duolingo') marketUrl = 'https://www.duolingo.com/';
+            else if (packageName === 'com.douban.frodo') marketUrl = 'https://www.douban.com/';
+            else if (packageName === 'com.tencent.qqmusic') marketUrl = 'https://y.qq.com/';
+            else if (packageName === 'com.netease.cloudmusic') marketUrl = 'https://music.163.com/';
+            else marketUrl = 'https://play.google.com/store/apps/details?id=' + packageName;
+            window.open(marketUrl, '_blank');
+          }
+        }
+    }, 2000);
+  } else {
+    // Unknown package: try intent://
+    var intentUrl = 'intent://#Intent;scheme=' + packageName.replace(/\./g, '') + ';package=' + packageName + ';end';
+    window.location.href = intentUrl;
+    setTimeout(function() {
+      showToast('无法唤起「' + (name || packageName) + '」，请确认应用已安装');
+    }, 2000);
+  }
+}
+
+function openToolAlternative(target, name) {
+  const mapping = TOOL_ALT_MAP[target];
+  const title = (mapping && mapping.title) || (name || target);
+  const icon = (mapping && mapping.icon) || '🛠️';
+  document.getElementById('tapTitle').innerHTML = icon + ' ' + title;
+
+  const body = document.getElementById('tapBody');
+
+  if (mapping && mapping.type === 'embed' && mapping.render) {
+    body.innerHTML = '';
+    mapping.render(body);
+  } else if (mapping && mapping.type === 'guide') {
+    body.innerHTML = '<div class="tap-guide">' +
+      '<div class="tap-guide-icon">' + (mapping.guideIcon || icon) + '</div>' +
+      '<div class="tap-guide-title">' + title + '</div>' +
+      '<div class="tap-guide-desc">' + (mapping.msg || '请在手机上手动操作').replace(/\n/g, '<br>') + '</div>' +
+      (mapping.actionLabel ? '<button class="tap-guide-btn" onclick="' + mapping.action + '()">' + mapping.actionLabel + '</button>' : '') +
+    '</div>';
+  } else {
+    // Unknown tool: generic guide
+    body.innerHTML = '<div class="tap-guide">' +
+      '<div class="tap-guide-icon">' + icon + '</div>' +
+      '<div class="tap-guide-title">' + title + '</div>' +
+      '<div class="tap-guide-desc">此功能需在电脑端使用，手机上请手动操作。</div>' +
+    '</div>';
+  }
+
+  document.getElementById('toolAltOverlay').classList.add('show');
+}
+
+function closeToolAlt() {
+  document.getElementById('toolAltOverlay').classList.remove('show');
+}
+
+// Overlay click dismiss
+(function() {
+  var tOverlay = document.getElementById('toolAltOverlay');
+  if (tOverlay) {
+    tOverlay.addEventListener('click', function(e) {
+      if (e.target === tOverlay) closeToolAlt();
+    });
+  }
+})();
+
+// ---- Camera Trigger ----
+function triggerCamera() {
+  document.getElementById('cameraTrigger').click();
+}
+function handleCameraCapture(event) {
+  var file = event.target.files[0];
+  if (file) {
+    showToast('已拍照：' + file.name);
+  }
+  // Reset so same file can be re-selected
+  event.target.value = '';
+}
+
+// ---- Notepad ----
+function renderNotepad(body) {
+  var saved = '';
+  try { saved = localStorage.getItem('jieduan_notepad') || ''; } catch(e) {}
+  body.innerHTML = '<div class="tap-notepad">' +
+    '<textarea id="tapNotepadText" placeholder="在这里写下任何东西...">' + escHtml(saved) + '</textarea>' +
+    '<div class="tap-notepad-bar">' +
+      '<span class="tap-nb-status" id="tapNbStatus">已从本地加载</span>' +
+      '<button onclick="copyNotepad()">复制全部</button>' +
+      '<button onclick="clearNotepad()">清除</button>' +
+    '</div>' +
+  '</div>';
+
+  var ta = document.getElementById('tapNotepadText');
+  var saveTimeout = null;
+  ta.addEventListener('input', function() {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(function() {
+      try { localStorage.setItem('jieduan_notepad', ta.value); } catch(e) {}
+      document.getElementById('tapNbStatus').textContent = '已自动保存 ' + new Date().toLocaleTimeString();
+    }, 500);
+  });
+}
+
+function copyNotepad() {
+  var ta = document.getElementById('tapNotepadText');
+  if (!ta) return;
+  ta.select();
+  try {
+    navigator.clipboard.writeText(ta.value).then(function() {
+      showToast('已复制全部内容');
+    }).catch(function() {
+      document.execCommand('copy');
+      showToast('已复制全部内容');
+    });
+  } catch(e) {
+    showToast('复制失败，请手动选择');
+  }
+}
+
+function clearNotepad() {
+  var ta = document.getElementById('tapNotepadText');
+  if (!ta) return;
+  ta.value = '';
+  try { localStorage.setItem('jieduan_notepad', ''); } catch(e) {}
+  document.getElementById('tapNbStatus').textContent = '已清空';
+  showToast('已清除');
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ---- Paint ----
+var paintData = { color: '#000000', size: 3, eraser: false, drawing: false };
+function renderPaint(body) {
+  var w = Math.min(body.clientWidth - 20, 400);
+  body.innerHTML = '<div class="tap-paint">' +
+    '<canvas id="tapPaintCanvas" width="' + w + '" height="' + Math.round(w * 0.75) + '"></canvas>' +
+    '<div class="tap-paint-toolbar">' +
+      colors.map(function(c) {
+        return '<span class="color-dot' + (c === paintData.color ? ' active' : '') + '" style="background:' + c + '" onclick="pickColor(\'' + c + '\',this)"></span>';
+      }).join('') +
+      '<input type="range" min="1" max="20" value="' + paintData.size + '" oninput="paintData.size=parseInt(this.value)">' +
+      '<button class="tap-btn' + (paintData.eraser ? ' active' : '') + '" onclick="toggleEraser(this)">🧹 橡皮</button>' +
+      '<button class="tap-btn" onclick="clearPaint()">🗑️ 清空</button>' +
+      '<button class="tap-btn" onclick="savePaint()">💾 保存</button>' +
+    '</div>' +
+  '</div>';
+
+  var canvas = document.getElementById('tapPaintCanvas');
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  function getPos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else if (e.changedTouches && e.changedTouches.length > 0) {
+      clientX = e.changedTouches[0].clientX;
+      clientY = e.changedTouches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    paintData.drawing = true;
+    var pos = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  }
+
+  function draw(e) {
+    if (!paintData.drawing) return;
+    e.preventDefault();
+    var pos = getPos(e);
+    ctx.lineWidth = paintData.size;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (paintData.eraser) {
+      ctx.strokeStyle = '#ffffff';
+    } else {
+      ctx.strokeStyle = paintData.color;
+    }
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  }
+
+  function endDraw() {
+    paintData.drawing = false;
+    ctx.beginPath();
+  }
+
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', endDraw);
+  canvas.addEventListener('mouseleave', endDraw);
+  canvas.addEventListener('touchstart', startDraw, { passive: false });
+  canvas.addEventListener('touchmove', draw, { passive: false });
+  canvas.addEventListener('touchend', endDraw);
+}
+
+var colors = ['#000000', '#ffffff', '#ff7675', '#fdcb6e', '#00cec9', '#6c5ce7', '#0984e3', '#e17055'];
+
+function pickColor(color, el) {
+  paintData.color = color;
+  paintData.eraser = false;
+  var dots = el.parentElement.querySelectorAll('.color-dot');
+  dots.forEach(function(d) { d.classList.remove('active'); });
+  el.classList.add('active');
+  var eraserBtn = el.parentElement.querySelector('.tap-btn');
+  if (eraserBtn) eraserBtn.classList.remove('active');
+}
+
+function toggleEraser(btn) {
+  paintData.eraser = !paintData.eraser;
+  btn.classList.toggle('active', paintData.eraser);
+  var dots = btn.parentElement.querySelectorAll('.color-dot');
+  dots.forEach(function(d) { d.classList.remove('active'); });
+}
+
+function clearPaint() {
+  var canvas = document.getElementById('tapPaintCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function savePaint() {
+  var canvas = document.getElementById('tapPaintCanvas');
+  if (!canvas) return;
+  canvas.toBlob(function(blob) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'drawing_' + Date.now() + '.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('已保存画作为图片');
+  }, 'image/png');
+}
+
+// ---- Calculator ----
+var calcState = { expr: '', result: '0', lastWasOp: false, justEvaluated: false };
+function renderCalc(body) {
+  body.innerHTML = '<div class="tap-calc">' +
+    '<div class="calc-display">' +
+      '<div class="calc-expr" id="calcExpr"></div>' +
+      '<div class="calc-result" id="calcResult">0</div>' +
+    '</div>' +
+    '<div class="calc-grid">' +
+      '<button class="btn-clr" onclick="calcClear()">C</button>' +
+      '<button class="btn-op" onclick="calcInput(\'÷\')">÷</button>' +
+      '<button class="btn-op" onclick="calcInput(\'×\')">×</button>' +
+      '<button class="btn-op" onclick="calcInput(\'-\')">-</button>' +
+      '<button class="btn-num" onclick="calcInput(\'7\')">7</button>' +
+      '<button class="btn-num" onclick="calcInput(\'8\')">8</button>' +
+      '<button class="btn-num" onclick="calcInput(\'9\')">9</button>' +
+      '<button class="btn-op" onclick="calcInput(\'+\')">+</button>' +
+      '<button class="btn-num" onclick="calcInput(\'4\')">4</button>' +
+      '<button class="btn-num" onclick="calcInput(\'5\')">5</button>' +
+      '<button class="btn-num" onclick="calcInput(\'6\')">6</button>' +
+      '<button class="btn-eq" onclick="calcEval()">=</button>' +
+      '<button class="btn-num" onclick="calcInput(\'1\')">1</button>' +
+      '<button class="btn-num" onclick="calcInput(\'2\')">2</button>' +
+      '<button class="btn-num" onclick="calcInput(\'3\')">3</button>' +
+      '<button class="btn-num" onclick="calcInput(\'0\')">0</button>' +
+      '<button class="btn-num" onclick="calcInput(\'.\')">.</button>' +
+      '<button class="btn-clr" onclick="calcBackspace()">⌫</button>' +
+    '</div>' +
+  '</div>';
+  updateCalcDisplay();
+}
+
+function calcInput(val) {
+  if (calcState.justEvaluated) {
+    if ('0123456789.'.indexOf(val) >= 0) {
+      calcState.expr = '';
+      calcState.result = '0';
+    }
+    calcState.justEvaluated = false;
+  }
+
+  var isOp = '+-×÷'.indexOf(val) >= 0;
+  if (isOp) {
+    if (calcState.lastWasOp && val !== '-') {
+      // Replace last operator
+      calcState.expr = calcState.expr.slice(0, -1) + val;
+    } else if (calcState.expr === '' && val !== '-') {
+      return; // cannot start with non-minus operator
+    } else {
+      calcState.expr += val;
+    }
+    calcState.lastWasOp = true;
+  } else {
+    calcState.expr += val;
+    calcState.lastWasOp = false;
+  }
+  updateCalcDisplay();
+}
+
+function calcEval() {
+  if (calcState.expr === '') return;
+  try {
+    var expr = calcState.expr.replace(/×/g, '*').replace(/÷/g, '/');
+    // Safety: only allow digits, operators, and decimal points
+    if (/[^0-9+\-*/.() ]/.test(expr)) throw new Error('Invalid');
+    var result = Function('"use strict"; return (' + expr + ')')();
+    if (result === Infinity || result === -Infinity || isNaN(result)) {
+      calcState.result = '错误';
+    } else {
+      calcState.result = parseFloat(result.toFixed(10)).toString();
+    }
+  } catch(e) {
+    calcState.result = '错误';
+  }
+  calcState.expr = calcState.result;
+  calcState.lastWasOp = false;
+  calcState.justEvaluated = true;
+  updateCalcDisplay();
+}
+
+function calcClear() {
+  calcState.expr = '';
+  calcState.result = '0';
+  calcState.lastWasOp = false;
+  calcState.justEvaluated = false;
+  updateCalcDisplay();
+}
+
+function calcBackspace() {
+  if (calcState.justEvaluated) {
+    calcClear();
+    return;
+  }
+  calcState.expr = calcState.expr.slice(0, -1);
+  calcState.lastWasOp = calcState.expr.length > 0 && '+-×÷'.indexOf(calcState.expr.slice(-1)) >= 0;
+  updateCalcDisplay();
+}
+
+function updateCalcDisplay() {
+  var exprEl = document.getElementById('calcExpr');
+  var resultEl = document.getElementById('calcResult');
+  if (exprEl) exprEl.textContent = calcState.expr;
+  if (resultEl) resultEl.textContent = calcState.result;
 }
 
 function getAltEffectData(alt) {
@@ -2539,10 +3122,8 @@ function showAltDetailOverlay(alt) {
 }
 
 function openVideoUrl(url) {
-  const apiUrl = `http://localhost:18888/open?action=open_url&target=${encodeURIComponent(url)}`;
-  fetch(apiUrl, { mode: 'no-cors' })
-    .then(() => showToast('正在打开视频链接'))
-    .catch(() => showToast('请在电脑端打开此功能，或手动在浏览器中打开链接'));
+  window.open(url, '_blank');
+  showToast('正在打开视频链接');
 }
 
 function closeAltDetail() {
@@ -3456,6 +4037,8 @@ setTimeout(renderContractDots, 100);
 
 console.log('戒断教练 - 完整原型已加载');
 console.log('页面：首页 | 分类详情 | 替代推荐 | 契约 | 契约详情 | 新建契约 | 计划 | 计划详情 | 报告(今日/本周/本月) | 设置 | 阻断规则 | 分类限额 | 时间银行 | 成就');
+// 电脑端如需使用 bridge_server.py 桥接功能（打开系统工具/模拟器应用），
+// 运行 bridge_server.py 后将 openAltApp() 中的 action 分发改回 fetch('http://localhost:18888/...') 即可。
 </script>
 <script>
 if ('serviceWorker' in navigator) {
