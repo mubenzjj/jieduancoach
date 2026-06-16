@@ -1,0 +1,14 @@
+{
+  "name": "戒断教练 - 防沉迷助手",
+  "short_name": "戒断教练",
+  "description": "基于分类管控、社交契约、替代推荐的智能手机防沉迷应用",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a10",
+  "theme_color": "#6c5ce7",
+  "orientation": "portrait-primary",
+  "icons": [
+    {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
