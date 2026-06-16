@@ -1368,6 +1368,47 @@ body {
 }
 .threshold-save-btn:hover { background: #7c6ff7; }
 
+/* Usage status bar on home page */
+.usage-status-bar {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.usage-status-bar .usb-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.usage-status-bar .usb-row:last-child { margin-bottom: 0; }
+.usage-status-bar .usb-label { font-size: 11px; color: var(--text3); }
+.usage-status-bar .usb-value { font-size: 12px; font-weight: 600; color: var(--text); }
+.usage-progress-wrap {
+  height: 4px; background: var(--card2); border-radius: 2px;
+  margin-bottom: 8px; overflow: hidden;
+}
+.usage-progress-fill {
+  height: 100%; border-radius: 2px; transition: width .4s ease, background .4s ease;
+}
+.usage-progress-fill.safe { background: var(--green); }
+.usage-progress-fill.warn { background: var(--orange); }
+.usage-progress-fill.danger { background: var(--red); }
+.usage-progress-fill.critical {
+  background: var(--red);
+  animation: usb-pulse .8s ease-in-out infinite alternate;
+}
+@keyframes usb-pulse { from { opacity: 1; } to { opacity: .5; } }
+
+/* Check button inline */
+.check-btn-inline {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(108,92,231,.12); color: var(--accent2);
+  border: 1px solid rgba(108,92,231,.2); border-radius: 8px;
+  padding: 6px 12px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+  margin-left: auto;
+}
+.check-btn-inline:hover { background: rgba(108,92,231,.2); }
+
 </style>
 </head>
 <body>
@@ -1516,6 +1557,24 @@ body {
       <!-- Account Area -->
       <div class="account-area" id="accountArea">
         <button class="account-login-btn" id="accountLoginBtn" onclick="showLoginPanel()">登录 / 注册</button>
+      </div>
+
+      <!-- Usage Status Bar -->
+      <div class="usage-status-bar" id="usageStatusBar" style="display:none">
+        <div class="usage-progress-wrap">
+          <div class="usage-progress-fill safe" id="usageProgressFill" style="width:0%"></div>
+        </div>
+        <div class="usb-row">
+          <span class="usb-label">今日已用</span>
+          <span class="usb-value" id="usbTodayUsage">--</span>
+        </div>
+        <div class="usb-row" id="usbBreakRow">
+          <span class="usb-label">距上次休息</span>
+          <span class="usb-value">--</span>
+        </div>
+        <div class="usb-row" style="justify-content:flex-end">
+          <button class="check-btn-inline" onclick="showBreakLockCheck()">⏰ 戒断检查</button>
+        </div>
       </div>
 
       <div class="hero-card" onclick="showDashboardDetail()">
@@ -2644,6 +2703,7 @@ function navTo(pageName) {
   if (pageName === 'achievements') renderAchievements();
   if (pageName === 'software-link') renderSoftwareLinkPage();
   if (pageName === 'settings') loadThresholdToUI();
+  if (pageName === 'home') { setTimeout(function() { renderUsageStatus(); }, 100); }
   if (pageName === 'new-contract') renderContractTemplates();
 }
 
@@ -4949,22 +5009,94 @@ function showBreakLockScreen(triggerData) {
 }
 
 function breakLockGoAlt() {
-  document.getElementById('breakLockScreen').classList.remove('show');
+  var bls = document.getElementById('breakLockScreen');
+  if (bls) bls.classList.remove('show');
   recordBreak();
+  renderUsageStatus();
   navTo('alternatives');
 }
 
 function breakLockThreeSec() {
-  document.getElementById('breakLockScreen').classList.remove('show');
+  var bls = document.getElementById('breakLockScreen');
+  if (bls) bls.classList.remove('show');
   recordBreak();
-  // Call the existing decision card
+  renderUsageStatus();
   showDecision('手机', '娱乐', '2.3', '1.4', '2h');
 }
 
 function breakLockSkip() {
-  document.getElementById('breakLockScreen').classList.remove('show');
+  var bls = document.getElementById('breakLockScreen');
+  if (bls) bls.classList.remove('show');
   recordSkip();
-  // Allow entry without recording break
+  renderUsageStatus();
+}
+
+// Get today usage safely (always returns number, never NaN)
+function getTodayUsageSafe() {
+  var val = 0;
+  try {
+    var raw = localStorage.getItem('jc_today_usage');
+    if (raw) {
+      val = parseInt(raw, 10);
+      if (isNaN(val)) val = 0;
+    }
+  } catch(e) { val = 0; }
+  return val;
+}
+
+// Render usage status bar on home page
+function renderUsageStatus() {
+  var bar = document.getElementById('usageStatusBar');
+  if (!bar) return;
+
+  var cfg = loadThreshold();
+  var usage = getTodayUsageSafe();
+  var limit = (cfg && cfg.dailyLimit) ? cfg.dailyLimit : 120;
+  var pct = limit > 0 ? Math.min(100, Math.round(usage / limit * 100)) : 0;
+
+  // Update progress bar
+  var fill = document.getElementById('usageProgressFill');
+  if (fill) {
+    fill.style.width = pct + '%';
+    fill.className = 'usage-progress-fill';
+    if (pct >= 100) fill.classList.add('critical');
+    else if (pct >= 80) fill.classList.add('danger');
+    else if (pct >= 50) fill.classList.add('warn');
+    else fill.classList.add('safe');
+  }
+
+  // Update usage text
+  var todayEl = document.getElementById('usbTodayUsage');
+  if (todayEl) {
+    todayEl.textContent = usage + ' 分钟 / 上限 ' + limit + ' 分钟';
+  }
+
+  // Update last break info
+  var lastBreak = getLastBreak();
+  var breakRow = document.getElementById('usbBreakRow');
+  if (breakRow) {
+    if (lastBreak) {
+      var elapsed = Math.floor((Date.now() - new Date(lastBreak).getTime()) / 60000);
+      breakRow.querySelector('.usb-value').textContent = elapsed + ' 分钟前';
+    } else {
+      breakRow.querySelector('.usb-value').textContent = '暂无记录';
+    }
+  }
+
+  bar.style.display = 'block';
+}
+
+// Manual break lock check (no threshold check — always shows lock screen)
+function showBreakLockCheck() {
+  var cfg = loadThreshold();
+  var usage = getTodayUsageSafe();
+  var triggerData = {
+    trigger: true,
+    reason: 'manual',
+    usage: usage,
+    limit: cfg.dailyLimit || 120
+  };
+  showBreakLockScreen(triggerData);
 }
 
 // Splash screen + detection flow
@@ -4978,6 +5110,8 @@ function breakLockSkip() {
     if (triggerData.trigger) {
       setTimeout(function() { showBreakLockScreen(triggerData); }, 400);
     }
+    // Always render usage status after splash settles (even when lock screen is shown, the bar is pre-rendered underneath)
+    setTimeout(function() { renderUsageStatus(); }, triggerData.trigger ? 600 : 500);
   }, 1500);
 })();
 
