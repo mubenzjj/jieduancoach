@@ -5131,103 +5131,70 @@ function showBreakLockCheck() {
   showBreakLockScreen(triggerData);
 }
 
-// Splash screen + detection flow (dual-insurance: transitionend + max-timeout)
+// Splash screen + detection flow (v4: bulletproof — direct DOM removal, no CSS transitions)
 (function initStartupFlow() {
-  console.log('[Splash] 启动流程开始');
+  console.log('[Splash] v4 启动流程开始');
   var splash = document.getElementById('splashScreen');
+
   if (!splash) {
-    console.log('[Splash] 未找到 splashScreen 元素，跳过');
-    try { renderUsageStatus(); } catch(e) { console.log('[Splash] renderUsageStatus error:', e); }
+    console.log('[Splash] 未找到 splashScreen 元素，直接初始化');
+    navTo('home');
+    try { renderUsageStatus(); } catch(e) {}
     return;
   }
 
-  var hidden = false;
-  function forceHideSplash() {
-    if (hidden) return;
-    hidden = true;
-    console.log('[Splash] 彻底移除 splash（display:none）');
-    splash.classList.add('hide');
-    splash.classList.add('hidden');
-  }
-
-  // Insurance 1: listen for CSS transitionend to set display:none after fade
-  splash.addEventListener('transitionend', function(e) {
-    if (e.propertyName === 'opacity' && !hidden) {
-      console.log('[Splash] transitionend: opacity 动画完成，设置 display:none');
-      forceHideSplash();
-    }
-  });
-
-  // Insurance 2: absolute max timeout — force hide no matter what
-  var forceTimer = setTimeout(function() {
-    if (!hidden) {
-      console.log('[Splash] 兜底：2.5s 强制关闭 splash（transition 可能未触发）');
-      forceHideSplash();
-    }
-  }, 2500);
-
-  // Main timer: detect thresholds after 1.5s
+  // 1.5s: directly remove splash from DOM — no CSS classes, no transitions, just gone
   setTimeout(function() {
-    console.log('[Splash] 1.5s: 开始检测阈值');
-    try { recordSession(); } catch(e) { console.log('[Splash] recordSession error:', e); }
+    console.log('[Splash] 1.5s: 直接移除 splash DOM 元素');
+    if (splash && splash.parentNode) {
+      splash.parentNode.removeChild(splash);
+    }
 
+    // Navigate to home page
+    navTo('home');
+
+    // Record session
+    try { recordSession(); } catch(e) {}
+
+    // Check thresholds and optionally show break lock screen
     var triggerData;
     try {
       triggerData = shouldTriggerBreakLock();
     } catch(e) {
-      console.log('[Splash] shouldTriggerBreakLock error:', e);
       triggerData = { trigger: false, reason: '' };
     }
 
-    console.log('[Splash] 检测结果:', triggerData.trigger ? '触发锁屏 — ' + triggerData.reason : '未触发');
-    splash.classList.add('hide');
+    console.log('[Splash] 阈值检测:', triggerData.trigger ? '触发锁屏 — ' + triggerData.reason : '未触发');
 
     if (triggerData.trigger) {
-      setTimeout(function() { showBreakLockScreen(triggerData); }, 400);
+      // Delay break lock screen slightly to let home page render first
+      setTimeout(function() {
+        showBreakLockScreen(triggerData);
+      }, 300);
     }
-    // Always render usage status after splash settles
-    setTimeout(function() {
-      try { renderUsageStatus(); } catch(e) { console.log('[Splash] renderUsageStatus error:', e); }
-    }, triggerData.trigger ? 600 : 500);
 
-    // Final safety net: ensure interactivity after everything settles
+    // Render usage status
+    try { renderUsageStatus(); } catch(e) {}
+
+    // Safety net: ensure interactivity
     setTimeout(function() {
-      try { ensureInteractivity(); } catch(e) { console.log('[Splash] ensureInteractivity error:', e); }
-    }, 3000);
+      try { ensureInteractivity(); } catch(e) {}
+    }, 600);
   }, 1500);
 })();
 
 // ============================
-// Safety Net: ensure all overlays are closed and page is interactive
+// Safety Net: ensure splash is gone and page is interactive
 // ============================
 function ensureInteractivity() {
-  console.log('[Safety] ensureInteractivity: 检查所有 overlay 状态');
-  var overlayIds = [
-    'loginOverlay', 'friendOverlay', 'toolAltOverlay',
-    'breakLockScreen', 'splashScreen',
-    'altDetailOverlay', 'modalOverlay', 'celebrationOverlay',
-    'softwareLinkPickerOverlay'
-  ];
-  var closedCount = 0;
-  overlayIds.forEach(function(id) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    // Force remove .show from all overlays EXCEPT if they're intentionally open
-    // (at startup, none should be open)
-    if (el.classList.contains('show')) {
-      console.log('[Safety] 发现残留 overlay: #' + id + ' 正在关闭');
-      el.classList.remove('show');
-      closedCount++;
-    }
-    // Ensure display:none for any overlay still visible
-    if (el.style.display !== 'none' && window.getComputedStyle(el).display !== 'none') {
-      el.style.setProperty('display', 'none', 'important');
-      closedCount++;
-    }
-    console.log('[Safety] #' + id + ': display=' + window.getComputedStyle(el).display +
-                ' visibility=' + window.getComputedStyle(el).visibility +
-                ' pointer-events=' + window.getComputedStyle(el).pointerEvents);
-  });
+  console.log('[Safety] ensureInteractivity: 检查 splash 残留');
+  // Only handle splashScreen — other overlays are managed by their own show/hide logic
+  // and should NOT be force-closed here, as they may be intentionally shown (e.g. breakLockScreen)
+  var splash = document.getElementById('splashScreen');
+  if (splash && splash.parentNode) {
+    console.log('[Safety] 发现残留 splash，强制移除');
+    splash.parentNode.removeChild(splash);
+  }
 
   // Ensure phone and screen containers are interactive
   var phone = document.getElementById('phone');
@@ -5235,7 +5202,7 @@ function ensureInteractivity() {
   var screen = document.getElementById('screen');
   if (screen) screen.style.setProperty('pointer-events', 'auto', 'important');
 
-  console.log('[Safety] ensureInteractivity 完成，关闭了 ' + closedCount + ' 个残留 overlay');
+  console.log('[Safety] ensureInteractivity 完成');
 }
 
 // ============================
