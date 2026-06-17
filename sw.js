@@ -1,8 +1,7 @@
-
 const CACHE_NAME = 'jieduancoach-v4';
 const PRECACHE_URLS = ['./index.html', './manifest.json'];
 
-// 瀹夎锛氶缂撳瓨鏍稿績鏂囦欢
+// 安装：预缓存核心文件
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
@@ -12,7 +11,8 @@ self.addEventListener('install', function(event) {
   self.skipWaiting();
 });
 
-// 婵€娲伙細娓呯悊鏃х紦瀛?self.addEventListener('activate', function(event) {
+// 激活：清理旧缓存
+self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then(function(names) {
       return Promise.all(
@@ -25,7 +25,7 @@ self.addEventListener('install', function(event) {
   self.clients.claim();
 });
 
-// fetch锛歂etwork First 绛栫暐
+// fetch：Network First 策略
 self.addEventListener('fetch', function(event) {
   if (event.request.method !== 'GET') return;
   event.respondWith(
