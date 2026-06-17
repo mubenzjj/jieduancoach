@@ -10270,7 +10270,7 @@ function showBreakLockCheck() {
 
     if (dirty && parseInt(dirty, 10) > 500) {
 
-      完整原型已加载);[Splash] Resetting accumulated usage:', dirty);
+      console.log('[Splash] Resetting accumulated usage:', dirty);
 
       localStorage.removeItem('jc_today_usage');
 
@@ -10284,7 +10284,7 @@ function showBreakLockCheck() {
 
 
 
-  完整原型已加载);[Splash] v5 启动流程开始);
+  console.log('[Splash] v5 启动流程开始');
 
   var splash = document.getElementById('splashScreen');
 
@@ -10292,7 +10292,7 @@ function showBreakLockCheck() {
 
   if (!splash) {
 
-    完整原型已加载);[Splash] 未找到 splashScreen 元素，直接初始化');
+    console.log('[Splash] 未找到 splashScreen 元素，直接初始化');
 
     navTo('home');
 
@@ -10308,7 +10308,7 @@ function showBreakLockCheck() {
 
   setTimeout(function() {
 
-    完整原型已加载);[Splash] 1.5s: 直接移除 splash DOM 元素');
+    console.log('[Splash] 1.5s: 直接移除 splash DOM 元素');
 
     if (splash && splash.parentNode) {
 
@@ -10366,7 +10366,7 @@ function showBreakLockCheck() {
 
 function ensureInteractivity() {
 
-  完整原型已加载);[Safety] ensureInteractivity: 检查splash 残留');
+  console.log('[Safety] ensureInteractivity: 检查splash 残留');
 
   // Only handle splashScreen --other overlays are managed by their own show/hide logic
 
@@ -10376,7 +10376,7 @@ function ensureInteractivity() {
 
   if (splash && splash.parentNode) {
 
-    完整原型已加载);[Safety] 发现残留 splash，强制移除);
+    console.log('[Safety] 发现残留 splash，强制移除');
 
     splash.parentNode.removeChild(splash);
 
@@ -10396,7 +10396,7 @@ function ensureInteractivity() {
 
 
 
-  完整原型已加载);[Safety] ensureInteractivity 完成');
+  console.log('[Safety] ensureInteractivity 完成');
 
 }
 
@@ -10646,9 +10646,9 @@ setTimeout(renderContractDots, 100);
 
 
 
-完整原型已加载);戒断教练 - 完整原型已加载);
+console.log('戒断教练 - 完整原型已加载');
 
-完整原型已加载);页面：首页 |分类详情 | 替代推荐 | 契约 | 契约详情 | 新建契约 | 计划 | 计划详情 | 报告(今日/本周/本月) | 设置 | 阻断规则 | 分类限额 | 时间银行 | 成就');
+console.log('页面：首页 |分类详情 | 替代推荐 | 契约 | 契约详情 | 新建契约 | 计划 | 计划详情 | 报告(今日/本周/本月) | 设置 | 阻断规则 | 分类限额 | 时间银行 | 成就');
 
 // 电脑端如需使用 bridge_server.py 桥接功能（打开系统工具/模拟器应用）用
 
