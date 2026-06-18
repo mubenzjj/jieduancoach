@@ -4499,7 +4499,19 @@ body {
 
 </div><!-- end phone -->
 
-
+<!-- Standalone startup: runs independently before main script -->
+<script>
+(function(){
+  function go(){
+    var s=document.getElementById('splashScreen');
+    if(s){s.style.display='none';s.remove();}
+    var h=document.getElementById('page-home');
+    if(h){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});h.classList.add('active');}
+  }
+  setTimeout(go,1500);
+  setTimeout(go,4000);
+})();
+</script>
 
 <script>
 
@@ -10255,36 +10267,6 @@ function showBreakLockCheck() {
   showBreakLockScreen(triggerData);
 
 }
-
-
-
-// ============================
-// Minimal startup (v6): guaranteed splash removal, zero external dependencies
-// ============================
-(function() {
-  function removeSplash() {
-    var s = document.getElementById('splashScreen');
-    if (s) {
-      if (s.parentNode) s.parentNode.removeChild(s);
-      else s.remove();
-    }
-  }
-
-  function startApp() {
-    removeSplash();
-    navTo('home');
-    try { renderUsageStatus(); } catch(e) {}
-  }
-
-  // Primary: remove splash after 1.5s
-  setTimeout(startApp, 1500);
-
-  // Failsafe: force-remove splash after 4s (guaranteed cleanup)
-  setTimeout(function() {
-    var s = document.getElementById('splashScreen');
-    if (s) { s.style.display = 'none'; s.remove(); navTo('home'); }
-  }, 4000);
-})();
 
 
 
