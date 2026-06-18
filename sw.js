@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jieduancoach-v5';
+const CACHE_NAME = 'jieduancoach-v6';
 const PRECACHE_URLS = ['./index.html', './manifest.json'];
 
 // 瀹夎锛氶缂撳瓨鏍稿績鏂囦欢
