@@ -588,6 +588,59 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* App Simulation Overlay */
+#appSimOverlay {
+  display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: #000; z-index: 250; flex-direction: column;
+}
+#appSimOverlay.show { display: flex; }
+.asim-navbar {
+  height: 52px; background: #111; display: flex; align-items: center;
+  padding: 0 16px; gap: 12px; border-bottom: 1px solid #222;
+}
+.asim-back {
+  background: none; border: none; color: var(--accent2); font-size: 14px;
+  cursor: pointer; padding: 4px 8px; border-radius: 6px;
+}
+.asim-back:hover { background: #222; }
+.asim-title { color: #fff; font-size: 16px; font-weight: 700; flex: 1; }
+.asim-timer { color: var(--text3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.asim-content {
+  flex: 1; overflow-y: auto; padding: 12px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.asim-post {
+  background: #111; border-radius: 12px; padding: 16px;
+  animation: asimSlideIn .4s ease;
+}
+@keyframes asimSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.asim-post .post-user { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.asim-post .post-avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--accent);
+  display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff;
+}
+.asim-post .post-name { font-size: 13px; color: #fff; font-weight: 600; }
+.asim-post .post-time { font-size: 11px; color: var(--text3); margin-left: auto; }
+.asim-post .post-video {
+  width: 100%; height: 180px; background: #1a1a2e; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text3); font-size: 12px; margin-bottom: 8px;
+}
+.asim-post .post-title { font-size: 14px; color: var(--text); font-weight: 600; margin-bottom: 6px; }
+.asim-post .post-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.asim-post .post-stats { display: flex; gap: 16px; margin-top: 10px; font-size: 11px; color: var(--text3); }
+.asim-bottom-nav {
+  height: 56px; background: #111; display: flex; align-items: center;
+  justify-content: space-around; border-top: 1px solid #222;
+}
+.asim-bottom-nav .asim-nav-item {
+  font-size: 11px; color: var(--text3); cursor: pointer; padding: 6px 12px; border-radius: 6px;
+}
+.asim-bottom-nav .asim-nav-item.active { color: var(--accent2); }
+
 /* Notification banner */
 .notify-banner {
   background: var(--card2); border-radius: var(--radius-sm);
@@ -1446,9 +1499,9 @@ body {
 <body>
 
 <div class="phone" id="phone">
-  <div class="status-bar" style="display:none">
-    <span>9:41</span>
-    <span>●●●●○ &nbsp; Wi-Fi</span>
+  <div class="status-bar" id="statusBar">
+    <span id="statusTime">09:41</span>
+    <span id="statusBattery">🔋 100%</span>
   </div>
 
 
@@ -1562,6 +1615,22 @@ body {
     <div class="hb-alt">或者试试：<span onclick="heavyBlockGoAlt()">5分钟正念呼吸</span></div>
   </div>
 
+  <!-- App Simulation Overlay -->
+  <div id="appSimOverlay">
+    <div class="asim-navbar">
+      <button class="asim-back" onclick="exitSimApp()">← 退出</button>
+      <span class="asim-title" id="asimAppName">抖音</span>
+      <span class="asim-timer" id="asimSimTimer">00:00</span>
+    </div>
+    <div class="asim-content" id="asimContent"></div>
+    <div class="asim-bottom-nav">
+      <span class="asim-nav-item active">首页</span>
+      <span class="asim-nav-item">发现</span>
+      <span class="asim-nav-item">消息</span>
+      <span class="asim-nav-item">我</span>
+    </div>
+  </div>
+
   <!-- Splash Screen -->
   <div id="splashScreen">
     <div class="splash-logo">🧠</div>
@@ -1611,18 +1680,18 @@ body {
 
       <div class="hero-card" onclick="showDashboardDetail()">
         <div class="hero-label">今日已用</div>
-        <div class="hero-time">2<span class="unit">h</span> 18<span class="unit">min</span></div>
+        <div class="hero-time" id="heroTimeDisplay">0<span class="unit">h</span> 0<span class="unit">min</span></div>
         <div class="hero-meta">
           <div class="hero-meta-item" onclick="event.stopPropagation();showToast('每日总预算：所有娱乐类 APP 合计不超过 4 小时')">预算 <strong>4h</strong></div>
-          <div class="hero-meta-item" onclick="event.stopPropagation();showToast('今日还能使用：1 小时 42 分钟 · 视频仅剩 36 分钟')">剩余 <strong>1h 42min</strong></div>
+          <div class="hero-meta-item" id="heroRemaining" onclick="event.stopPropagation();showToast('今日还能使用：1 小时 42 分钟 · 视频仅剩 36 分钟')">剩余 <strong>4h 0min</strong></div>
           <div class="hero-meta-item" onclick="event.stopPropagation();navTo('reports');showToast('查看详细解锁记录')">解锁 <strong>28次</strong></div>
         </div>
       </div>
 
-      <div class="timer-bar" id="timerBar">
+      <div class="timer-bar" id="timerBar" onclick="endTimerEarly()">
         <span class="timer-label">⏳ 限时放行</span>
         <span class="timer-count" id="timerCount">15:00</span>
-        <span class="timer-sub">抖音 · 到期后将提醒</span>
+        <span class="timer-sub">抖音 · 到期后将提醒（点击提前结束）</span>
       </div>
 
       <div class="section-title">分类概览 <span style="font-size:10px;color:var(--text3);font-weight:400">点击查看详情</span></div>
@@ -4209,7 +4278,7 @@ function closeDecision() {
 }
 function continueApp() {
   closeDecision();
-  showToast('已放行，15分钟后将再次提醒');
+  launchSimApp('抖音');
 }
 function limitApp() {
   closeDecision();
@@ -4974,6 +5043,9 @@ function recordSession() {
   sessions.push({ startTime: new Date().toISOString(), endTime: null, duration: 0 });
   if (sessions.length > 100) sessions = sessions.slice(-100);
   localStorage.setItem('jc_sessions', JSON.stringify(sessions));
+  // Also persist session start timestamp for tick engine
+  jcSessionStartTime = Date.now();
+  localStorage.setItem('jc_session_start_time', String(jcSessionStartTime));
 }
 
 function closeCurrentSession() {
@@ -4995,7 +5067,7 @@ function shouldTriggerBreakLock() {
   var cfg = loadThreshold();
   if (!cfg.enabled) return { trigger: false, reason: '' };
 
-  var usage = bumpTodayUsage(); // Add random bump on each check
+  var usage = getCurrentUsageMinutes(); // Real-time tick-based usage
   var lastBreak = getLastBreak();
   var now = Date.now();
 
@@ -5137,7 +5209,7 @@ function renderUsageStatus() {
 // Manual break lock check (no threshold check — always shows lock screen)
 function showBreakLockCheck() {
   var cfg = loadThreshold();
-  var usage = getTodayUsageSafe();
+  var usage = getCurrentUsageMinutes();
   var triggerData = {
     trigger: true,
     reason: 'manual',
@@ -5336,32 +5408,263 @@ document.getElementById('softwarePickerOverlay')?.addEventListener('click', func
   if (e.target === this) this.classList.remove('show');
 });
 
-// Timer bar simulating "Drain timed release"
-let timerActive = false;
-function startTimer() {
-  if (timerActive) return;
-  timerActive = true;
-  document.getElementById('timerBar').classList.add('show');
-  let sec = 15*60;
-  const countEl = document.getElementById('timerCount');
-  function tick() {
-    if (sec <= 0) {
-      document.getElementById('timerBar').classList.remove('show');
-      showDecision('抖音','视频','2.3','1.4','2h');
-      timerActive = false;
-      return;
-    }
-    const m = Math.floor(sec/60);
-    const s = sec%60;
-    countEl.textContent = m + ':' + String(s).padStart(2,'0');
-    sec--;
-    setTimeout(tick, 1000);
+// ==============================
+// GLOBAL TICK ENGINE
+// ==============================
+var jcTimerSec = -1;          // -1 = inactive, >=0 = active countdown seconds
+var jcSimActive = false;
+var jcSimStartTime = 0;
+var jcSimDuration = 0;
+var jcSimAppName = '';
+var jcSimBreakLevel = 0;      // 0=none, 1=L1 triggered, 2=L2 triggered, 3=L3 triggered
+var jcLastL1Time = 0;
+var jcLastL2Time = 0;
+var jcLastL3Time = 0;
+var jcUsageBaseMinutes = 0;
+var jcSessionStartTime = 0;
+var jcBatteryLevel = 100;
+var jcBatteryDrainPerTick = 0.003; // ~0.18%/min, ~10.8%/hour
+
+// Init: load persisted state
+(function initTickState() {
+  var sst = localStorage.getItem('jc_session_start_time');
+  if (sst) {
+    jcSessionStartTime = parseInt(sst, 10);
+  } else {
+    jcSessionStartTime = Date.now();
+    localStorage.setItem('jc_session_start_time', String(jcSessionStartTime));
   }
-  tick();
+  jcUsageBaseMinutes = getTodayUsageSafe();
+  jcBatteryLevel = parseFloat(localStorage.getItem('jc_battery_level')) || 100;
+  // Check date rollover
+  var today = new Date().toDateString();
+  var lastDate = localStorage.getItem('jc_last_date');
+  if (lastDate && lastDate !== today) {
+    jcUsageBaseMinutes = 0;
+    localStorage.setItem('jc_today_usage', '0');
+    jcSessionStartTime = Date.now();
+    localStorage.setItem('jc_session_start_time', String(jcSessionStartTime));
+    jcBatteryLevel = 100;
+    console.log('[Tick] 日期变更，重置今日使用量');
+  }
+  localStorage.setItem('jc_last_date', today);
+})();
+
+function tickClock() {
+  var now = new Date();
+  var hh = String(now.getHours()).padStart(2, '0');
+  var mm = String(now.getMinutes()).padStart(2, '0');
+  var el = document.getElementById('statusTime');
+  if (el) el.textContent = hh + ':' + mm;
+
+  // Battery
+  jcBatteryLevel = Math.max(5, jcBatteryLevel - jcBatteryDrainPerTick);
+  localStorage.setItem('jc_battery_level', String(jcBatteryLevel.toFixed(1)));
+  var batEl = document.getElementById('statusBattery');
+  if (batEl) {
+    var pct = Math.round(jcBatteryLevel);
+    var icon = pct >= 80 ? '🔋' : pct >= 40 ? '🔋' : pct >= 15 ? '🪫' : '⚡';
+    batEl.textContent = icon + ' ' + pct + '%';
+  }
 }
 
-// Simulate: start timer after 3 seconds on home page
-setTimeout(startTimer, 5000);
+function getCurrentUsageMinutes() {
+  var elapsed = (Date.now() - jcSessionStartTime) / 60000;
+  return jcUsageBaseMinutes + Math.max(0, Math.floor(elapsed));
+}
+
+function tickUsageTimer() {
+  var totalMin = getCurrentUsageMinutes();
+  var h = Math.floor(totalMin / 60);
+  var m = totalMin % 60;
+
+  // Hero time display
+  var ht = document.getElementById('heroTimeDisplay');
+  if (ht) {
+    ht.innerHTML = h + '<span class="unit">h</span> ' + m + '<span class="unit">min</span>';
+  }
+
+  // Hero remaining
+  var cfg = loadThreshold();
+  var limit = (cfg && cfg.dailyLimit) ? cfg.dailyLimit : 120;
+  var remainMin = Math.max(0, limit - totalMin);
+  var rh = Math.floor(remainMin / 60);
+  var rm = remainMin % 60;
+  var hr = document.getElementById('heroRemaining');
+  if (hr) {
+    hr.innerHTML = '剩余 <strong>' + rh + 'h ' + rm + 'min</strong>';
+  }
+
+  // Usage status bar
+  renderUsageStatus();
+
+  // If in sim app, update sim timer
+  if (jcSimActive) {
+    var simElapsed = Math.floor((Date.now() - jcSimStartTime) / 1000);
+    var sm = Math.floor(simElapsed / 60);
+    var ss = simElapsed % 60;
+    var st = document.getElementById('asimSimTimer');
+    if (st) st.textContent = String(sm).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
+  }
+}
+
+function tickAutoTriggers() {
+  var totalMin = getCurrentUsageMinutes();
+  var cfg = loadThreshold();
+  var limit = (cfg && cfg.dailyLimit) ? cfg.dailyLimit : 120;
+  var now = Date.now();
+  var cooldown20 = 20 * 60 * 1000;
+
+  // L1: usage >= 45 min, repeat every 15 min
+  if (totalMin >= 45 && (now - jcLastL1Time) > cooldown20) {
+    var l1El = document.getElementById('lightReminder');
+    if (!l1El || !l1El.classList.contains('show')) {
+      jcLastL1Time = now;
+      showLightReminder();
+    }
+  }
+
+  // L2: usage >= 80% of daily limit
+  var pct80 = Math.floor(limit * 0.8);
+  if (totalMin >= pct80 && (now - jcLastL2Time) > cooldown20) {
+    var decOverlay = document.getElementById('decisionOverlay');
+    if (!decOverlay || !decOverlay.classList.contains('show')) {
+      jcLastL2Time = now;
+      showDecision('手机', '娱乐', (totalMin/60).toFixed(1), '1.5', limit/60 + 'h');
+    }
+  }
+
+  // L3: usage >= 100% of daily limit
+  if (totalMin >= limit && (now - jcLastL3Time) > cooldown20) {
+    var hb = document.getElementById('heavyBlock');
+    if (!hb || !hb.classList.contains('show')) {
+      jcLastL3Time = now;
+      showHeavyBlock();
+    }
+  }
+
+  // Sim app: check if duration reached, trigger next block
+  if (jcSimActive && jcSimDuration > 0) {
+    var simElapsed = (Date.now() - jcSimStartTime) / 1000;
+    if (simElapsed >= jcSimDuration) {
+      if (jcSimBreakLevel === 0) {
+        jcSimBreakLevel = 1;
+        jcLastL1Time = Date.now();
+        showLightReminder();
+      } else if (jcSimBreakLevel === 1 && simElapsed >= jcSimDuration + 30) {
+        jcSimBreakLevel = 2;
+        jcLastL2Time = Date.now();
+        showDecision(jcSimAppName, '视频', (getCurrentUsageMinutes()/60).toFixed(1), '1.5', limit/60 + 'h');
+      } else if (jcSimBreakLevel === 2 && simElapsed >= jcSimDuration + 90) {
+        jcSimBreakLevel = 3;
+        jcLastL3Time = Date.now();
+        showHeavyBlock();
+      }
+    }
+  }
+}
+
+// Timer bar (tick-based countdown)
+function tickTimerBar() {
+  if (jcTimerSec < 0) return;
+  if (jcTimerSec <= 0) {
+    document.getElementById('timerBar').classList.remove('show');
+    showDecision('抖音', '视频', '2.3', '1.4', '2h');
+    jcTimerSec = -1;
+    return;
+  }
+  var m = Math.floor(jcTimerSec / 60);
+  var s = jcTimerSec % 60;
+  var el = document.getElementById('timerCount');
+  if (el) el.textContent = m + ':' + String(s).padStart(2, '0');
+  jcTimerSec--;
+}
+
+function startTimer() {
+  if (jcTimerSec >= 0) return;
+  jcTimerSec = 15 * 60;
+  document.getElementById('timerBar').classList.add('show');
+}
+
+function endTimerEarly() {
+  if (jcTimerSec < 0) return;
+  jcTimerSec = 0;
+  document.getElementById('timerBar').classList.remove('show');
+  showDecision('抖音', '视频', '2.3', '1.4', '2h');
+}
+
+// App Simulation
+function launchSimApp(appName) {
+  jcSimActive = true;
+  jcSimAppName = appName;
+  jcSimStartTime = Date.now();
+  jcSimDuration = 180 + Math.floor(Math.random() * 121); // 180-300 sec (3-5 min)
+  jcSimBreakLevel = 0;
+  document.getElementById('appSimOverlay').classList.add('show');
+  document.getElementById('asimAppName').textContent = appName;
+  document.getElementById('asimSimTimer').textContent = '00:00';
+  // Generate fake posts
+  var posts = [];
+  var usernames = ['小明的日常', '科技数码控', '美食侦探', '旅行日记', '搞笑段子手', '电影推荐官', '健身打卡'];
+  for (var i = 0; i < 12; i++) {
+    var u = usernames[Math.floor(Math.random() * usernames.length)];
+    posts.push({
+      user: u,
+      avatar: u.charAt(0),
+      title: '超精彩的「' + appName + '」推荐 #第' + (i+1) + '期',
+      desc: '这条内容真的太赞了！刷到停不下来，强烈推荐给所有' + appName + '爱好者。点赞收藏不迷路~',
+      likes: Math.floor(Math.random() * 9999) + 100,
+      comments: Math.floor(Math.random() * 500) + 10
+    });
+  }
+  var html = '';
+  posts.forEach(function(p) {
+    html += '<div class="asim-post">' +
+      '<div class="post-user">' +
+        '<div class="post-avatar">' + p.avatar + '</div>' +
+        '<span class="post-name">' + p.user + '</span>' +
+        '<span class="post-time">刚刚</span>' +
+      '</div>' +
+      '<div class="post-video">▶ ' + appName + ' 精彩视频内容</div>' +
+      '<div class="post-title">' + p.title + '</div>' +
+      '<div class="post-desc">' + p.desc + '</div>' +
+      '<div class="post-stats">' +
+        '<span>❤ ' + p.likes + '</span>' +
+        '<span>💬 ' + p.comments + '</span>' +
+        '<span>↗ 分享</span>' +
+      '</div>' +
+    '</div>';
+  });
+  document.getElementById('asimContent').innerHTML = html;
+}
+
+function exitSimApp() {
+  jcSimActive = false;
+  jcSimAppName = '';
+  jcSimBreakLevel = 0;
+  document.getElementById('appSimOverlay').classList.remove('show');
+  showToast('已退出模拟使用');
+  renderUsageStatus();
+}
+
+// Master tick
+function masterTick() {
+  tickClock();
+  tickUsageTimer();
+  tickTimerBar();
+  tickAutoTriggers();
+
+  // Persist today usage every 10 ticks (10 seconds)
+  if (Math.floor(Date.now() / 1000) % 10 === 0) {
+    var m = getCurrentUsageMinutes();
+    localStorage.setItem('jc_today_usage', String(m));
+  }
+}
+
+// Auto-start timer bar after 5 seconds on home page
+setTimeout(function() {
+  if (jcTimerSec < 0) startTimer();
+}, 5000);
 
 // Also: render contract dots for the second contract on contracts page
 function renderContractDots() {
@@ -5380,6 +5683,10 @@ console.log('戒断教练 - 完整原型已加载');
 console.log('页面：首页 | 分类详情 | 替代推荐 | 契约 | 契约详情 | 新建契约 | 计划 | 计划详情 | 报告(今日/本周/本月) | 设置 | 阻断规则 | 分类限额 | 时间银行 | 成就');
 // 电脑端如需使用 bridge_server.py 桥接功能（打开系统工具/模拟器应用），
 // 运行 bridge_server.py 后将 openAltApp() 中的 action 分发改回 fetch('http://localhost:18888/...') 即可。
+
+// Start global tick engine (1-second heartbeat)
+setInterval(masterTick, 1000);
+
 </script>
 <script>
 if ('serviceWorker' in navigator) {
