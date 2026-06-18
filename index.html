@@ -10258,177 +10258,33 @@ function showBreakLockCheck() {
 
 
 
-// Splash screen + detection flow (v4: bulletproof --direct DOM removal, no CSS transitions)
-
-(function initStartupFlow() {
-
-  // v5 cleanup: reset accumulated usage from previous testing sessions
-
-  try {
-
-    var dirty = localStorage.getItem('jc_today_usage');
-
-    if (dirty && parseInt(dirty, 10) > 500) {
-
-      console.log('[Splash] Resetting accumulated usage:', dirty);
-
-      localStorage.removeItem('jc_today_usage');
-
-      localStorage.removeItem('jc_last_break');
-
-      localStorage.removeItem('jc_skip_log');
-
+// ============================
+// Minimal startup (v6): guaranteed splash removal, zero external dependencies
+// ============================
+(function() {
+  function removeSplash() {
+    var s = document.getElementById('splashScreen');
+    if (s) {
+      if (s.parentNode) s.parentNode.removeChild(s);
+      else s.remove();
     }
-
-  } catch(e) {}
-
-
-
-  console.log('[Splash] v5 启动流程开始');
-
-  var splash = document.getElementById('splashScreen');
-
-
-
-  if (!splash) {
-
-    console.log('[Splash] 未找到 splashScreen 元素，直接初始化');
-
-    navTo('home');
-
-    try { renderUsageStatus(); } catch(e) {}
-
-    return;
-
   }
 
+  function startApp() {
+    removeSplash();
+    navTo('home');
+    try { renderUsageStatus(); } catch(e) {}
+  }
 
+  // Primary: remove splash after 1.5s
+  setTimeout(startApp, 1500);
 
-  // 1.5s: directly remove splash from DOM --no CSS classes, no transitions, just gone
-
+  // Failsafe: force-remove splash after 4s (guaranteed cleanup)
   setTimeout(function() {
-
-    console.log('[Splash] 1.5s: 直接移除 splash DOM 元素');
-
-    if (splash && splash.parentNode) {
-
-      splash.parentNode.removeChild(splash);
-
-    }
-
-
-
-    // Navigate to home page
-
-    navTo('home');
-
-
-
-    // Record session
-
-    try { recordSession(); } catch(e) {}
-
-
-
-    // Break lock: only triggered manually, NOT on startup (v5)
-
-    // This avoids the "always-locked" problem where jc_today_usage accumulates
-
-    // on every page load and never drops below threshold.
-
-
-
-    // Render usage status
-
-    try { renderUsageStatus(); } catch(e) {}
-
-
-
-    // Safety net: ensure interactivity
-
-    setTimeout(function() {
-
-      try { ensureInteractivity(); } catch(e) {}
-
-    }, 600);
-
-  }, 1500);
-
+    var s = document.getElementById('splashScreen');
+    if (s) { s.style.display = 'none'; s.remove(); navTo('home'); }
+  }, 4000);
 })();
-
-
-
-// ============================
-
-// Safety Net: ensure splash is gone and page is interactive
-
-// ============================
-
-function ensureInteractivity() {
-
-  console.log('[Safety] ensureInteractivity: 检查splash 残留');
-
-  // Only handle splashScreen --other overlays are managed by their own show/hide logic
-
-  // and should NOT be force-closed here, as they may be intentionally shown (e.g. breakLockScreen)
-
-  var splash = document.getElementById('splashScreen');
-
-  if (splash && splash.parentNode) {
-
-    console.log('[Safety] 发现残留 splash，强制移除');
-
-    splash.parentNode.removeChild(splash);
-
-  }
-
-
-
-  // Ensure phone and screen containers are interactive
-
-  var phone = document.getElementById('phone');
-
-  if (phone) phone.style.setProperty('pointer-events', 'auto', 'important');
-
-  var screen = document.getElementById('screen');
-
-  if (screen) screen.style.setProperty('pointer-events', 'auto', 'important');
-
-
-
-  console.log('[Safety] ensureInteractivity 完成');
-
-}
-
-
-
-// ============================
-
-// Global error handler: prevent uncaught errors from killing interactivity
-
-// ============================
-
-window.onerror = function(msg, source, lineno, colno, err) {
-
-  console.error('[GlobalError]', msg, 'at', source + ':' + lineno, err);
-
-  // Ensure interactivity even after an error
-
-  try { ensureInteractivity(); } catch(e) {}
-
-  return false; // let browser also handle it
-
-};
-
-
-
-window.addEventListener('unhandledrejection', function(event) {
-
-  console.error('[UnhandledRejection]', event.reason);
-
-  try { ensureInteractivity(); } catch(e) {}
-
-});
 
 
 
